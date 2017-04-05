@@ -1,4 +1,4 @@
-package crawler;
+package athena.crawler;
 
 public class Crawler {
     public static final Integer DFS_MODE = 1;

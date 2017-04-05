@@ -1,6 +1,7 @@
-package retrievalmodel;
+package athena.retrievalmodel;
 
-import index.InvertedIndexer;
+import athena.index.InvertedIndexer;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -8,17 +9,19 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.*;
 
+@Component
 public class BM25 {
+
     private static final Integer K2 = 100;
     private static final Double K1 = 1.2;
     private static final Double B = 0.75;
-    private static final String SPACE = " ";
+    private static final String SPILT_CHARACTER = " ";
 
     public HashMap<String, Double> calculateBM25(String query) {
         HashMap<String, Double> bm25Map = new HashMap<>();
         InvertedIndexer invertedIndexer = new InvertedIndexer();
-        HashMap<String, HashMap<String, Integer>> index = invertedIndexer.readIndexFromJsonFile(1);
-        HashMap<String, Integer> tokenCountMap = invertedIndexer.readTokenCountToJsonFile(1);
+        HashMap<String, HashMap<String, Integer>> index = invertedIndexer.readIndexFromJsonFile();
+        HashMap<String, Integer> tokenCountMap = invertedIndexer.readTokenCountToJsonFile();
         Double averageTokenCount = getAverageTokenCount(tokenCountMap);
         Integer totalDocumentCount = tokenCountMap.size();
 
@@ -35,7 +38,8 @@ public class BM25 {
                 Integer termQueryCount = queryMap.get(s);
                 for (String t : termKeySet) {
                     Double value = Math.log((totalDocumentCount - termDocumentCount + 0.5) / (termDocumentCount + 0.5));
-                    value = value * (((K1 + 1) * terms.get(t)) / (calculateK(tokenCountMap.get(t), averageTokenCount) + terms.get(t)));
+                    value = value * (((K1 + 1) * terms.get(t)) / (calculateK(tokenCountMap.get(t), averageTokenCount) +
+                            terms.get(t)));
                     value = value * (((K2 + 1) * termQueryCount) / (K2 + termQueryCount));
                     if (bm25Map.containsKey(t)) {
                         bm25Map.put(t, bm25Map.get(t) + value);
@@ -51,7 +55,7 @@ public class BM25 {
 
     private HashMap<String, Integer> getQueryMap(String query) {
         HashMap<String, Integer> hashMap = new HashMap<>();
-        String[] strings = query.split(SPACE);
+        String[] strings = query.split(SPILT_CHARACTER);
         for (String s : strings) {
             if (hashMap.containsKey(s)) {
                 hashMap.put(s, hashMap.get(s) + 1);
@@ -89,7 +93,6 @@ public class BM25 {
         int length = 60;
         int k = 1;
         String s1;
-
         // Interstellar
 
         DecimalFormat numberFormat = new DecimalFormat("#.000");

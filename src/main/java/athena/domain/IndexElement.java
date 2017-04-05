@@ -1,4 +1,4 @@
-package domain;
+package athena.domain;
 
 public class IndexElement {
     private String documentID;

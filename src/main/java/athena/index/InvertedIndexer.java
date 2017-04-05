@@ -1,22 +1,46 @@
-package index;
+package athena.index;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import crawler.CrawlerUtils;
+import athena.crawler.CrawlerUtils;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.io.*;
 import java.util.*;
 
+@Component
 public class InvertedIndexer {
 
-    private final static String FOLDER_PATH = "HW3\\";
+    @Value("${search.engine.ngrams}")
+    private Integer nGrams;
+    @Value("${search.engine.enable.case.fold}")
+    private Boolean doCaseFold;
+    @Value("${search.engine.remove.noise.factor}")
+    private Integer noiseFactor;
+
+    private String indexFolder;
+    private String inputFolder;
+
+    private final static String FOLDER_INDEX = "C:\\Lucifer\\Default\\";
+    //private final static String FOLDER_PATH_INPUT = FOLDER_INDEX + "IndexFiles\\";
     private final static String FILE_ENCODING = "UTF-8";
     private final static String STRING_REPLACEMENT = " ";
+
+    public InvertedIndexer(String indexFolder) {
+        System.out.println("InPara");
+        this.indexFolder = indexFolder;
+    }
+
+    public InvertedIndexer() {
+        System.out.println("InDefault");
+        this.indexFolder = FOLDER_INDEX;
+    }
 
     public HashMap<String, HashSet<String>> tokenizeHTMLFiles(String folderPath) {
         HashMap<String, HashSet<String>> pageInLinks = new HashMap<>();
@@ -27,13 +51,20 @@ public class InvertedIndexer {
         try {
             File folder = new File(folderPath);
             File[] files = folder.listFiles();
-            for (File file : files) {
-                document = Jsoup.parse(file, FILE_ENCODING);
-                content = getTextContent(document);
-                content = caseFoldText(content);
-                content = removeNoise(content);
-                content = removeNoise(content);
-                crawlerUtils.createIndexFile(formatFileName(file.getName()), content);
+            if(files == null) {
+
+            } else {
+                for (File file : files) {
+                    document = Jsoup.parse(file, FILE_ENCODING);
+                    content = getTextContent(document);
+                    if (doCaseFold) {
+                        content = caseFoldText(content);
+                    }
+                    for (int i = 0; i < noiseFactor; i++) {
+                        content = removeNoise(content);
+                    }
+                    crawlerUtils.createTokenizedFile(formatFileName(file.getName()), content);
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -83,7 +114,7 @@ public class InvertedIndexer {
         return StringUtils.replace(text, "  ", STRING_REPLACEMENT);
     }
 
-    public void createIndex(Integer nGrams) {
+    public void createIndex(String inputFolder) {
         HashMap<String, HashMap<String, Integer>> index = new HashMap<>();
         HashMap<String, Integer> terms;
         HashMap<String, Integer> tokenCountMap = new HashMap<>();
@@ -91,7 +122,7 @@ public class InvertedIndexer {
         int tokenCount;
         String word;
         try {
-            File folder = new File(FOLDER_PATH + "IndexFiles\\");
+            File folder = new File(inputFolder);
             File[] files = folder.listFiles();
             for (File file : files) {
                 String documentID = StringUtils.remove(file.getName(), ".txt");
@@ -124,11 +155,11 @@ public class InvertedIndexer {
                 }
             }
             System.out.println(index.size());
-            writeIndexToJsonFile(index, nGrams);
+            writeIndexToJsonFile(index);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        writeTokenCountToJsonFile(tokenCountMap, nGrams);
+        writeTokenCountToJsonFile(tokenCountMap);
     }
 
     private List<String> getValidWords(String[] strings) {
@@ -174,18 +205,18 @@ public class InvertedIndexer {
         return documentFrequency;
     }
 
-    private void writeIndexToJsonFile(HashMap<String, HashMap<String, Integer>> index, Integer nGrams) {
+    private void writeIndexToJsonFile(HashMap<String, HashMap<String, Integer>> index) {
         writeToJsonFile(index, "Index_" + nGrams);
     }
 
-    private void writeTokenCountToJsonFile(HashMap<String, Integer> token, Integer nGrams) {
+    private void writeTokenCountToJsonFile(HashMap<String, Integer> token) {
         writeToJsonFile(token, "TokenCount_" + nGrams);
     }
 
     private void writeToJsonFile(Object object, String fileName) {
         try {
             ObjectMapper mapper = new ObjectMapper();
-            File file = new File(FOLDER_PATH + fileName + ".json");
+            File file = new File(indexFolder + fileName + ".json");
             mapper.writerWithDefaultPrettyPrinter().writeValue(file, object);
         } catch (IOException e) {
             e.printStackTrace();
@@ -196,7 +227,7 @@ public class InvertedIndexer {
         Object object = new Object();
         try {
             ObjectMapper mapper = new ObjectMapper();
-            File file = new File(FOLDER_PATH + fileName + ".json");
+            File file = new File(indexFolder + fileName + ".json");
             object = mapper.readValue(file, Object.class);
         } catch (IOException e) {
             e.printStackTrace();
@@ -246,18 +277,18 @@ public class InvertedIndexer {
         return sortDocumentFrequency(documentFrequencyList);
     }
 
-    public HashMap<String, HashMap<String, Integer>> readIndexFromJsonFile(Integer nGrams) {
+    public HashMap<String, HashMap<String, Integer>> readIndexFromJsonFile() {
         return (HashMap<String, HashMap<String, Integer>>) readFromJsonFile("Index_" + nGrams);
     }
 
-    public HashMap<String, Integer> readTokenCountToJsonFile(Integer nGrams) {
+    public HashMap<String, Integer> readTokenCountToJsonFile() {
         return (HashMap<String, Integer>) readFromJsonFile("TokenCount_" + nGrams);
     }
 
     public void generateTermFrequencyCSV(HashMap<String, Integer> hashMap, String fileName) {
         try {
             CSVFormat csvFormat = CSVFormat.EXCEL;
-            File file = new File(FOLDER_PATH + fileName + ".csv");
+            File file = new File(indexFolder + fileName + ".csv");
             FileWriter fileWriter = new FileWriter(file);
             CSVPrinter csvPrinter = new CSVPrinter(fileWriter, csvFormat);
             Set<String> hashKeySet = hashMap.keySet();
@@ -284,7 +315,7 @@ public class InvertedIndexer {
     public void generateDocumentFrequencyCSV(List<List<String>> docList, String fileName) {
         try {
             CSVFormat csvFormat = CSVFormat.EXCEL;
-            File file = new File(FOLDER_PATH + fileName + ".csv");
+            File file = new File(indexFolder + fileName + ".csv");
             FileWriter fileWriter = new FileWriter(file);
             CSVPrinter csvPrinter = new CSVPrinter(fileWriter, csvFormat);
             List<String> record = new ArrayList<>();
@@ -305,7 +336,7 @@ public class InvertedIndexer {
     public void generateTermFrequencyLogCSV(HashMap<String, Integer> hashMap, String fileName) {
         try {
             CSVFormat csvFormat = CSVFormat.EXCEL;
-            File file = new File(FOLDER_PATH + fileName + ".csv");
+            File file = new File(indexFolder + fileName + ".csv");
             FileWriter fileWriter = new FileWriter(file);
             CSVPrinter csvPrinter = new CSVPrinter(fileWriter, csvFormat);
             Set<String> hashKeySet = hashMap.keySet();

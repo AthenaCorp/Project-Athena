@@ -1,4 +1,4 @@
-package crawler;
+package athena.crawler;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -25,7 +25,7 @@ public class CrawlerUtils {
         }
     }
 
-    public void createIndexFile(String filename, String content) {
+    public void createTokenizedFile(String filename, String content) {
         writeToFile(INDEX_FILES_FOLDER, filename, content, TEXT_FILE);
     }
 

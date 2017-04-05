@@ -1,4 +1,4 @@
-package crawler;
+package athena.crawler;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;

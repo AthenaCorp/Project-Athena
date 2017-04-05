@@ -1,4 +1,4 @@
-package crawler;
+package athena.crawler;
 
 import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;

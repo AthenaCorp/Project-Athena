@@ -1,4 +1,4 @@
-package execute;
+package athena.execute;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.core.SimpleAnalyzer;
@@ -20,7 +20,7 @@ import java.io.*;
 import java.util.ArrayList;
 
 /**
- * To create Apache Lucene index in a folder and add files into this index based
+ * To create Apache Lucene athena.index in a folder and add files into this athena.index based
  * on the input of the user.
  */
 public class HW4 {
@@ -32,7 +32,7 @@ public class HW4 {
 
     public static void main(String[] args) throws IOException {
         System.out
-                .println("Enter the FULL path where the index will be created: (e.g. /Usr/index or c:\\temp\\index)");
+                .println("Enter the FULL path where the athena.index will be created: (e.g. /Usr/athena.index or c:\\temp\\athena.index)");
 
         String indexLocation = null;
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -43,7 +43,7 @@ public class HW4 {
             indexLocation = s;
             indexer = new HW4(s);
         } catch (Exception ex) {
-            System.out.println("Cannot create index..." + ex.getMessage());
+            System.out.println("Cannot create athena.index..." + ex.getMessage());
             System.exit(-1);
         }
 
@@ -53,7 +53,7 @@ public class HW4 {
         while (!s.equalsIgnoreCase("q")) {
             try {
                 System.out
-                        .println("Enter the FULL path to add into the index (q=quit): (e.g. /home/mydir/docs or c:\\Users\\mydir\\docs)");
+                        .println("Enter the FULL path to add into the athena.index (q=quit): (e.g. /home/mydir/docs or c:\\Users\\mydir\\docs)");
                 System.out
                         .println("[Acceptable file types: .xml, .html, .html, .txt]");
                 s = br.readLine();
@@ -61,7 +61,7 @@ public class HW4 {
                     break;
                 }
 
-                // try to add file into the index
+                // try to add file into the athena.index
                 indexer.indexFileOrDirectory(s);
             } catch (Exception e) {
                 System.out.println("Error indexing " + s + " : "
@@ -71,7 +71,7 @@ public class HW4 {
 
         // ===================================================
         // after adding, we always have to call the
-        // closeIndex, otherwise the index is not created
+        // closeIndex, otherwise the athena.index is not created
         // ===================================================
         indexer.closeIndex();
 
@@ -126,8 +126,8 @@ public class HW4 {
     /**
      * Constructor
      *
-     * @param indexDir the name of the folder in which the index should be created
-     * @throws java.io.IOException when exception creating index.
+     * @param indexDir the name of the folder in which the athena.index should be created
+     * @throws java.io.IOException when exception creating athena.index.
      */
     HW4(String indexDir) throws IOException {
 
@@ -143,7 +143,7 @@ public class HW4 {
      * Indexes a file or directory
      *
      * @param fileName the name of a text file or a folder we wish to add to the
-     *                 index
+     *                 athena.index
      * @throws java.io.IOException when exception
      */
     public void indexFileOrDirectory(String fileName) throws IOException {
@@ -200,7 +200,7 @@ public class HW4 {
         } else {
             String filename = file.getName().toLowerCase();
             // ===================================================
-            // Only index text files
+            // Only athena.index text files
             // ===================================================
             if (filename.endsWith(".htm") || filename.endsWith(".html")
                     || filename.endsWith(".xml") || filename.endsWith(".txt")) {
@@ -212,7 +212,7 @@ public class HW4 {
     }
 
     /**
-     * Close the index.
+     * Close the athena.index.
      *
      * @throws java.io.IOException when exception closing
      */

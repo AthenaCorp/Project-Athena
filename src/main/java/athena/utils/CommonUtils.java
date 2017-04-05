@@ -1,4 +1,4 @@
-package utils;
+package athena.utils;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;

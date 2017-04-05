@@ -1,7 +1,7 @@
-package execute;
+package athena.execute;
 
-import retrievalmodel.BM25;
-import utils.CommonUtils;
+import athena.retrievalmodel.BM25;
+import athena.utils.CommonUtils;
 
 import java.util.HashMap;
 
