@@ -1,13 +1,12 @@
 package athena.index;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import athena.crawler.CrawlerUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -25,96 +24,87 @@ public class InvertedIndexer {
     private Integer noiseFactor;
 
     private String indexFolder;
-    private String inputFolder;
+    private String dataFolder;
 
-    private final static String FOLDER_INDEX = "C:\\Lucifer\\Default\\";
-    //private final static String FOLDER_PATH_INPUT = FOLDER_INDEX + "IndexFiles\\";
+    private final static String FOLDER_INDEX = "\\Athena\\Index\\";
     private final static String FILE_ENCODING = "UTF-8";
     private final static String STRING_REPLACEMENT = " ";
 
-    public InvertedIndexer(String indexFolder) {
-        System.out.println("InPara");
-        this.indexFolder = indexFolder;
-    }
+    @Autowired
+    private CrawlerUtils crawlerUtils;
 
     public InvertedIndexer() {
-        System.out.println("InDefault");
         this.indexFolder = FOLDER_INDEX;
+        setDataFolder(indexFolder);
     }
 
-    public HashMap<String, HashSet<String>> tokenizeHTMLFiles(String folderPath) {
-        HashMap<String, HashSet<String>> pageInLinks = new HashMap<>();
-        Document document;
-        String content;
-        CrawlerUtils crawlerUtils = new CrawlerUtils();
+    public String getIndexFolder() {
+        return indexFolder;
+    }
 
+    public void setIndexFolder(String indexFolder) {
+        this.indexFolder = indexFolder;
+        setDataFolder(indexFolder);
+    }
+
+    private void setDataFolder(String indexFolder) {
+        this.dataFolder = indexFolder + "\\DataFiles\\";
+    }
+
+    public String getDataFolder() {
+        return dataFolder;
+    }
+
+    private void tokenizeHTMLFiles(String folderPath) {
+        String content;
         try {
             File folder = new File(folderPath);
             File[] files = folder.listFiles();
-            if(files == null) {
-
+            if (files == null) {
+                System.out.println("No files present or invalid folder");
             } else {
                 for (File file : files) {
-                    document = Jsoup.parse(file, FILE_ENCODING);
-                    content = getTextContent(document);
+                    content = Jsoup.parse(file, FILE_ENCODING).text();
                     if (doCaseFold) {
                         content = caseFoldText(content);
                     }
                     for (int i = 0; i < noiseFactor; i++) {
                         content = removeNoise(content);
                     }
-                    crawlerUtils.createTokenizedFile(formatFileName(file.getName()), content);
+                    createTokenizedFile(formatFileName(file.getName()), content);
                 }
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return pageInLinks;
     }
 
     private String formatFileName(String fileName) {
-        fileName = StringUtils.remove(fileName, " - Wikipedia.html");
-        fileName = (StringUtils.removeAll(fileName, "[ ._]")).replace("-", "");
-        return fileName;
-    }
-
-    private String getTextContent(Document document) {
-        Element content = document.getElementById("mw-content-text");
-        content.getElementsByClass("hatnote").remove();
-        content.getElementsByClass("toc").remove();
-        content.getElementsByClass("infobox").remove();
-        content.getElementsByClass("image").remove();
-        content.getElementsByClass("reflist").remove();
-        content.getElementsByClass("navbox").remove();
-        content.getElementsByClass("external").remove();
-        content.getElementsByClass("metadata").remove();
-        content.getElementsByClass("citation").remove();
-        content.getElementsByClass("mw-editsection").remove();
-        content.getElementsByAttributeValue("aria-label", "Navbox");
-        return content.text();
+        return StringUtils.remove(fileName, ".html");
     }
 
     private String caseFoldText(String text) {
         return text.toLowerCase();
     }
 
+    //TODO: Time is not getting preserved. Do we have to?
+    //TODO: Not Preserving "," not relevant with Casm
     private String removeNoise(String text) {
         text = StringUtils.replaceAll(text, "(\\[[0-9]\\w{0,3}\\])", STRING_REPLACEMENT);
-        text = StringUtils.replaceAll(text, "(,+ )|(\\.+ )|(\\-+ )|( -+)|( ,+)|( \\.+)|(^-)|(^,)|(^\\.)", STRING_REPLACEMENT);
-        text = StringUtils.replaceAll(text, "(,+ )", STRING_REPLACEMENT);
+        text = StringUtils.replaceAll(text, "(\\.+ )|(\\-+ )|( -+)|( \\.+)|(^-)|(^\\.)", STRING_REPLACEMENT);
         text = StringUtils.replaceAll(text, "(\\.+ )", STRING_REPLACEMENT);
         text = StringUtils.replaceAll(text, "(\\-+ )", STRING_REPLACEMENT);
         text = StringUtils.replaceAll(text, "( -+)", STRING_REPLACEMENT);
-        text = StringUtils.replaceAll(text, "( ,+)", STRING_REPLACEMENT);
         text = StringUtils.replaceAll(text, "( \\.+)", STRING_REPLACEMENT);
         text = StringUtils.replaceAll(text, "(^-)", STRING_REPLACEMENT);
-        text = StringUtils.replaceAll(text, "(^,)", STRING_REPLACEMENT);
         text = StringUtils.replaceAll(text, "(^\\.)", STRING_REPLACEMENT);
-        text = StringUtils.replaceAll(text, "([^0-9a-zA-Z\\.\\,\\- ])", STRING_REPLACEMENT);
+        text = StringUtils.replaceAll(text, "([^0-9a-zA-Z\\.\\- ])", STRING_REPLACEMENT);
         return StringUtils.replace(text, "  ", STRING_REPLACEMENT);
     }
 
     public void createIndex(String inputFolder) {
+        tokenizeHTMLFiles(inputFolder);
+
         HashMap<String, HashMap<String, Integer>> index = new HashMap<>();
         HashMap<String, Integer> terms;
         HashMap<String, Integer> tokenCountMap = new HashMap<>();
@@ -122,7 +112,7 @@ public class InvertedIndexer {
         int tokenCount;
         String word;
         try {
-            File folder = new File(inputFolder);
+            File folder = new File(dataFolder);
             File[] files = folder.listFiles();
             for (File file : files) {
                 String documentID = StringUtils.remove(file.getName(), ".txt");
@@ -154,7 +144,7 @@ public class InvertedIndexer {
                     tokenCountMap.put(documentID, tokenCount);
                 }
             }
-            System.out.println(index.size());
+            System.out.println("Index Size : " + index.size());
             writeIndexToJsonFile(index);
         } catch (IOException e) {
             e.printStackTrace();
@@ -221,6 +211,10 @@ public class InvertedIndexer {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void createTokenizedFile(String filename, String content) {
+        crawlerUtils.writeToFile(dataFolder, filename, content, CrawlerUtils.TEXT_FILE);
     }
 
     private Object readFromJsonFile(String fileName) {
@@ -297,10 +291,8 @@ public class InvertedIndexer {
             records.add("Term");
             records.add("Frequency");
             csvPrinter.printRecord(records);
-            int i = 1;
             for (String s : hashKeySet) {
                 records = new ArrayList<>();
-                //records.add(i++ + "");
                 records.add(s);
                 records.add(hashMap.get(s) + "");
                 csvPrinter.printRecord(records);

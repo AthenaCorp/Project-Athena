@@ -14,8 +14,9 @@ public class SpringExecutor {
 
         CommonUtils commonUtils = new CommonUtils();
         long startTime = commonUtils.printTimeStamp("Index Creation Started");
-        String inputFolder = "C:\\Lucifer\\IndexFiles";
-        InvertedIndexer indexer = (InvertedIndexer) context.getBean("invertedIndexer", "C:\\Lucifer\\Test\\");
+        String inputFolder = "C:\\Lucifer\\cacm";
+        InvertedIndexer indexer = (InvertedIndexer) context.getBean("invertedIndexer");
+        indexer.setIndexFolder("C:\\Lucifer\\");
         indexer.createIndex(inputFolder);
         long stopTime = commonUtils.printTimeStamp("Index Creation Completed");
         commonUtils.printTotalTime(startTime, stopTime);

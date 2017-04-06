@@ -1,10 +1,13 @@
 package athena.crawler;
 
+import org.springframework.stereotype.Component;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashSet;
 
+@Component
 public class CrawlerUtils {
     private static final String WEB_PAGES_FOLDER = "HW3\\WebPages";
     private static final String INDEX_FILES_FOLDER = "HW3\\IndexFiles";
@@ -25,11 +28,7 @@ public class CrawlerUtils {
         }
     }
 
-    public void createTokenizedFile(String filename, String content) {
-        writeToFile(INDEX_FILES_FOLDER, filename, content, TEXT_FILE);
-    }
-
-    private void writeToFile(String folderName, String filename, String content, Integer FileType) {
+    public void writeToFile(String folderName, String filename, String content, Integer FileType) {
         FileWriter fileWriter;
         try {
             File file = new File(folderName + "/" + filename.replaceAll("[/+\"'@$%^*&<>,?]", "")
