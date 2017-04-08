@@ -14,7 +14,7 @@ public class Executor {
         //executor.executeTask1(folderPath);
         //executor.executeTask2();
         //executor.executeTask3();
-//        executor.executeBM25();
+        executor.executeBM25();
         executor.executeTfIdf();
     }
 

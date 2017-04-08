@@ -7,35 +7,32 @@ import java.util.*;
 /**
  * Created by Pallav on 4/8/2017.
  */
-public class TfIdf {
+public class TfIdf extends RetrievalModelImp{
 
-    BM25 helpObject = new BM25();
     HashMap<String, Double> tfIdfMap = new HashMap<>();
     InvertedIndexer invertedIndexer = new InvertedIndexer();
     HashMap<String, HashMap<String, Integer>> index = invertedIndexer.readIndexFromJsonFile();
     HashMap<String, Integer> tokenCountMap = invertedIndexer.readTokenCountToJsonFile();
-    Double averageTokenCount = helpObject.getAverageTokenCount(tokenCountMap);
     Integer totalDocumentCount = tokenCountMap.size();
 
     public HashMap<String,Double> calculateTfIdf(String query) {
 
-        HashMap<String,Double> scores = new HashMap<>();
-        List<String> queryTerms = new ArrayList<>(Arrays.asList(query.split
-                (" ")));
+        HashMap queryTerms = getQueryMap(query);
+        Set<String> queries = queryTerms.keySet();
         Set<String> docs = tokenCountMap.keySet();
 
         for(String s: docs) {
             String docId = s;                           //Document name
             double tfIdfScore = 0;
-            for (int i=0; i<queryTerms.size(); i++) {
-                String queryTerm = queryTerms.get(i);
+            for (String q: queries) {
+                String queryTerm = q;
                 double tf = calculateTf(queryTerm,docId);
                 double idf = calculateIdf(queryTerm,docId);
                 tfIdfScore += tf*idf;
             }
-            scores.put(docId,tfIdfScore);
+            tfIdfMap.put(docId,tfIdfScore);
         }
-        return scores;
+        return sortBM(tfIdfMap);
     }
 
     public double calculateTf(String queryTerm, String docId) {

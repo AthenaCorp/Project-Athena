@@ -10,7 +10,7 @@ import java.text.DecimalFormat;
 import java.util.*;
 
 @Component
-public class BM25 {
+public class BM25 extends RetrievalModelImp {
 
     private static final Integer K2 = 100;
     private static final Double K1 = 1.2;
@@ -53,68 +53,8 @@ public class BM25 {
         return sortBM(bm25Map);
     }
 
-    private HashMap<String, Integer> getQueryMap(String query) {
-        HashMap<String, Integer> hashMap = new HashMap<>();
-        String[] strings = query.split(SPILT_CHARACTER);
-        for (String s : strings) {
-            if (hashMap.containsKey(s)) {
-                hashMap.put(s, hashMap.get(s) + 1);
-            } else {
-                hashMap.put(s, 1);
-            }
-        }
-        return hashMap;
-    }
-
-    public double getAverageTokenCount(HashMap<String, Integer> tokenCount) {
-        Integer totalTokenCount = 0;
-        for (String s : tokenCount.keySet()) {
-            totalTokenCount += tokenCount.get(s);
-        }
-        return ((double) totalTokenCount / tokenCount.size());
-    }
-
     private Double calculateK(Integer documentLength, Double averageLength) {
         return K1 * ((1 - B) + B * (documentLength / averageLength));
     }
 
-
-    private HashMap<String, Double> sortBM(HashMap<String, Double> hashMap) {
-        List<Map.Entry<String, Double>> entrySet = new ArrayList<>(hashMap.entrySet());
-        entrySet.sort((a, b) -> Double.compare(b.getValue(), a.getValue()));
-        HashMap<String, Double> hashMap1 = new LinkedHashMap<>();
-        for (Map.Entry<String, Double> e : entrySet) {
-            hashMap1.put(e.getKey(), e.getValue());
-        }
-        return hashMap1;
-    }
-
-    public void printN(HashMap<String, Double> hashMap, Integer count, Integer queryID) {
-        int length = 60;
-        int k = 1;
-        String s1;
-        // Interstellar
-
-        DecimalFormat numberFormat = new DecimalFormat("#.000");
-        File file = new File("Task2_" + queryID + ".txt");
-        try {
-            FileWriter fileWriter = new FileWriter(file);
-            for (String s : hashMap.keySet()) {
-                s1 = s;
-                while (length > s1.length()) {
-                    s1 = s1 + " ";
-                }
-                fileWriter.write(queryID + "\tQ0   " + s1 + k + "\t\t" + numberFormat.format(hashMap.get(s)) + "  Normandy\n");
-                k++;
-                if (k > count) {
-                    break;
-                }
-            }
-            fileWriter.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-    }
 }
