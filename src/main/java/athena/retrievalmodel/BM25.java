@@ -66,7 +66,7 @@ public class BM25 {
         return hashMap;
     }
 
-    private double getAverageTokenCount(HashMap<String, Integer> tokenCount) {
+    public double getAverageTokenCount(HashMap<String, Integer> tokenCount) {
         Integer totalTokenCount = 0;
         for (String s : tokenCount.keySet()) {
             totalTokenCount += tokenCount.get(s);

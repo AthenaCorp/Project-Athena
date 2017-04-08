@@ -1,6 +1,7 @@
 package athena.execute;
 
 import athena.retrievalmodel.BM25;
+import athena.retrievalmodel.TfIdf;
 import athena.utils.CommonUtils;
 
 import java.util.HashMap;
@@ -13,7 +14,8 @@ public class Executor {
         //executor.executeTask1(folderPath);
         //executor.executeTask2();
         //executor.executeTask3();
-        executor.executeBM25();
+//        executor.executeBM25();
+        executor.executeTfIdf();
     }
 
     public void executeBM25() {
@@ -31,6 +33,28 @@ public class Executor {
         for(Integer i : queries.keySet()) {
             HashMap<String, Double> bm = bm25.calculateBM25(queries.get(i));
             bm25.printN(bm, 100, i);
+        }
+
+        long stopTime = commonUtils.printTimeStamp("Index Creation Completed");
+        commonUtils.printTotalTime(startTime, stopTime);
+    }
+
+    public void executeTfIdf() {
+        CommonUtils commonUtils = new CommonUtils();
+        long startTime = commonUtils.printTimeStamp("Index Creation Started");
+
+        TfIdf tfIdf = new TfIdf();
+        BM25 bm25 = new BM25();
+
+        HashMap<Integer, String> queries = new HashMap<>();
+        queries.put(1, "global warming potential");
+        queries.put(2, "green power renewable energy");
+        queries.put(3, "solar energy california");
+        queries.put(4, "light bulb bulbs alternative alternatives");
+
+        for(Integer i : queries.keySet()) {
+            HashMap<String, Double> tidf = tfIdf.calculateTfIdf(queries.get(i));
+            bm25.printN(tidf, 100, i);
         }
 
         long stopTime = commonUtils.printTimeStamp("Index Creation Completed");
