@@ -3,7 +3,6 @@ package athena.utils;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -12,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-@Component
 public class CommonUtils {
     private final String[] unitList = new String[]{"ms", "secs", "mins", "hrs"};
     private static final int MILLI_TIME_FACTOR = 1000;
@@ -105,7 +103,7 @@ public class CommonUtils {
         return resourcePath;
     }
 
-    public void verifyFolder(String folder) {
+    public static void verifyFolder(String folder) {
         File file = new File(folder);
         if(!file.exists()) {
             if(file.mkdir()) {

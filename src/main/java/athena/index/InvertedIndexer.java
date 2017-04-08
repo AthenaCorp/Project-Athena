@@ -27,17 +27,17 @@ public class InvertedIndexer {
     private String indexFolder;
     private String dataFolder;
 
-    private final static String FOLDER_INDEX = "\\Athena\\Index\\";
+    private final static String FOLDER_INDEX = "\\Athena\\";
     private final static String FILE_ENCODING = "UTF-8";
     private final static String STRING_REPLACEMENT = " ";
 
     @Autowired
     private CrawlerUtils crawlerUtils;
-    @Autowired
-    private CommonUtils commonUtils;
 
     public InvertedIndexer() {
-        this.indexFolder = FOLDER_INDEX;
+        CommonUtils commonUtils = new CommonUtils();
+        this.indexFolder = commonUtils.getResourcePath() + FOLDER_INDEX;
+        CommonUtils.verifyFolder(indexFolder);
         setDataFolder(indexFolder);
     }
 
@@ -47,14 +47,15 @@ public class InvertedIndexer {
 
     public void setIndexFolder(String indexFolder) {
         this.indexFolder = indexFolder;
+        CommonUtils.verifyFolder(indexFolder);
         setDataFolder(indexFolder);
-        commonUtils.verifyFolder(indexFolder);
     }
 
     private void setDataFolder(String indexFolder) {
-        this.dataFolder = indexFolder + "\\DataFiles\\";
-        commonUtils.verifyFolder(dataFolder);
+        this.dataFolder = indexFolder + "DataFiles\\";
+        CommonUtils.verifyFolder(dataFolder);
     }
+
 
     public String getDataFolder() {
         return dataFolder;
