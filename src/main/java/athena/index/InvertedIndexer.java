@@ -1,6 +1,7 @@
 package athena.index;
 
 import athena.crawler.CrawlerUtils;
+import athena.utils.CommonUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -32,6 +33,8 @@ public class InvertedIndexer {
 
     @Autowired
     private CrawlerUtils crawlerUtils;
+    @Autowired
+    private CommonUtils commonUtils;
 
     public InvertedIndexer() {
         this.indexFolder = FOLDER_INDEX;
@@ -45,10 +48,12 @@ public class InvertedIndexer {
     public void setIndexFolder(String indexFolder) {
         this.indexFolder = indexFolder;
         setDataFolder(indexFolder);
+        commonUtils.verifyFolder(indexFolder);
     }
 
     private void setDataFolder(String indexFolder) {
         this.dataFolder = indexFolder + "\\DataFiles\\";
+        commonUtils.verifyFolder(dataFolder);
     }
 
     public String getDataFolder() {
@@ -88,7 +93,7 @@ public class InvertedIndexer {
     }
 
     //TODO: Time is not getting preserved. Do we have to?
-    //TODO: Not Preserving "," not relevant with Casm
+    //TODO: Not Preserving "," not relevant with Cacm
     private String removeNoise(String text) {
         text = StringUtils.replaceAll(text, "(\\[[0-9]\\w{0,3}\\])", STRING_REPLACEMENT);
         text = StringUtils.replaceAll(text, "(\\.+ )|(\\-+ )|( -+)|( \\.+)|(^-)|(^\\.)", STRING_REPLACEMENT);
@@ -102,9 +107,7 @@ public class InvertedIndexer {
         return StringUtils.replace(text, "  ", STRING_REPLACEMENT);
     }
 
-    public void createIndex(String inputFolder) {
-        tokenizeHTMLFiles(inputFolder);
-
+    public HashMap<String, HashMap<String, Integer>> createIndex(File[] files) {
         HashMap<String, HashMap<String, Integer>> index = new HashMap<>();
         HashMap<String, Integer> terms;
         HashMap<String, Integer> tokenCountMap = new HashMap<>();
@@ -112,8 +115,6 @@ public class InvertedIndexer {
         int tokenCount;
         String word;
         try {
-            File folder = new File(dataFolder);
-            File[] files = folder.listFiles();
             for (File file : files) {
                 String documentID = StringUtils.remove(file.getName(), ".txt");
                 FileReader fileReader = new FileReader(file);
@@ -144,12 +145,20 @@ public class InvertedIndexer {
                     tokenCountMap.put(documentID, tokenCount);
                 }
             }
-            System.out.println("Index Size : " + index.size());
-            writeIndexToJsonFile(index);
         } catch (IOException e) {
             e.printStackTrace();
         }
+        System.out.println("Index Size : " + index.size());
+        writeIndexToJsonFile(index);
         writeTokenCountToJsonFile(tokenCountMap);
+        return index;
+    }
+
+    public void createIndex(String inputFolder) {
+        tokenizeHTMLFiles(inputFolder);
+        File folder = new File(dataFolder);
+        File[] files = folder.listFiles();
+        createIndex(files);
     }
 
     private List<String> getValidWords(String[] strings) {
