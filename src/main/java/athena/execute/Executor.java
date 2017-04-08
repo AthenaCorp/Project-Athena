@@ -3,6 +3,7 @@ package athena.execute;
 import athena.retrievalmodel.BM25;
 import athena.retrievalmodel.TfIdf;
 import athena.utils.CommonUtils;
+import athena.queryexpansion.PsFeedback;
 
 import java.util.HashMap;
 
@@ -14,8 +15,16 @@ public class Executor {
         //executor.executeTask1(folderPath);
         //executor.executeTask2();
         //executor.executeTask3();
-        //executor.executeBM25();
-        executor.executeTfIdf();
+//        executor.executeBM25();
+        //executor.executeTfIdf();
+        executor.executePS();
+    }
+
+    public void executePS() {
+
+        System.out.println(PsFeedback.expandQuery("samelson"));
+
+
     }
 
     public void executeBM25() {
@@ -47,10 +56,10 @@ public class Executor {
         BM25 bm25 = new BM25();
 
         HashMap<Integer, String> queries = new HashMap<>();
-        queries.put(1, "samelson");
-        /*queries.put(2, "green power renewable energy");
+        queries.put(1, "global warming potential");
+        queries.put(2, "green power renewable energy");
         queries.put(3, "solar energy california");
-        queries.put(4, "light bulb bulbs alternative alternatives");*/
+        queries.put(4, "light bulb bulbs alternative alternatives");
 
         for(Integer i : queries.keySet()) {
             HashMap<String, Double> tidf = tfIdf.calculateTfIdf(queries.get(i));

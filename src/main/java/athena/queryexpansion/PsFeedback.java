@@ -14,7 +14,7 @@ public class PsFeedback {
 
     public static String expandQuery(String query){
         BM25 b = new BM25();
-        String result;
+        String result = query;
         InvertedIndexer in = new InvertedIndexer();
         CommonUtils commonUtils = new CommonUtils();
 
@@ -34,16 +34,14 @@ public class PsFeedback {
                 .generateTermFrequencyTable
                 (topdocs));
         Set<String > sortkeyset = sortedTF.keySet();
+
         int j = 0;
         for (String s : sortkeyset) {
             if(j<4){
-                result = query.concat(s);
+                result = result + " "+ s;
             }
             j++;
         }
-
-
-        return query;
-
+        return result;
     }
 }

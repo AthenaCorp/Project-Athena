@@ -149,7 +149,7 @@ public class InvertedIndexer {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println("Index Size : " + index.size());
+        //System.out.println("Index Size : " + index.size());
         writeIndexToJsonFile(index);
         writeTokenCountToJsonFile(tokenCountMap);
         return index;
