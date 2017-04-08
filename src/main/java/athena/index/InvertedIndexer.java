@@ -188,7 +188,8 @@ public class InvertedIndexer {
         return validWords;
     }
 
-    private LinkedHashMap<String, Integer> sortTermFrequency(HashMap<String, Integer> hashMap) {
+    public LinkedHashMap<String, Integer> sortTermFrequency(HashMap<String,
+            Integer> hashMap) {
         List<Map.Entry<String, Integer>> entries = new ArrayList<>(hashMap.entrySet());
         entries.sort((a, b) -> Integer.compare(b.getValue(), a.getValue()));
 
