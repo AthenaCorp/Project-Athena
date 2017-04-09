@@ -2,9 +2,6 @@ package athena.retrievalmodel;
 
 import java.util.HashMap;
 
-/**
- * Created by Pallav on 4/8/2017.
- */
 public interface RetrievalModel {
 
     // Split the whole query into separate words and counts

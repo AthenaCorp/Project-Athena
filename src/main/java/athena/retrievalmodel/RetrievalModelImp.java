@@ -1,14 +1,13 @@
 package athena.retrievalmodel;
 
+import athena.queryexpansion.PsFeedback;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.*;
 
-/**
- * Created by Pallav on 4/8/2017.
- */
 public class RetrievalModelImp implements RetrievalModel {
 
 
@@ -74,6 +73,11 @@ public class RetrievalModelImp implements RetrievalModel {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
 
+    public String expandThisQuery(String query){
+        BM25 b = new BM25();
+        HashMap<String, Double> bm25map = b.calculateBM25(query);
+        return PsFeedback.expandQuery(query, bm25map);
     }
 }

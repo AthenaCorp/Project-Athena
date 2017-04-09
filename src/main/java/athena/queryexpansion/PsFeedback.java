@@ -7,19 +7,16 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Set;
 
-/**
- * Created by Harshit on 4/8/2017.
- */
 public class PsFeedback {
 
-    public static String expandQuery(String query){
-        BM25 b = new BM25();
+    public static String expandQuery(String query, HashMap<String, Double>
+            initialScores){
+
         String result = query;
         InvertedIndexer in = new InvertedIndexer();
         CommonUtils commonUtils = new CommonUtils();
 
-        HashMap<String, Double> bm25map = b.calculateBM25(query);
-        Set<String > keySet = bm25map.keySet();
+        Set<String > keySet = initialScores.keySet();
         File[] files = new File[keySet.size()];
         int i = 0;
         for (String s : keySet) {

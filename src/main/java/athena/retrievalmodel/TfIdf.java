@@ -5,9 +5,6 @@ import athena.index.InvertedIndexer;
 import java.util.HashMap;
 import java.util.Set;
 
-/**
- * Created by Pallav on 4/8/2017.
- */
 public class TfIdf extends RetrievalModelImp {
 
     HashMap<String, Double> tfIdfMap = new HashMap<>();
