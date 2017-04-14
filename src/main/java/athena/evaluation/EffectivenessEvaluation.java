@@ -25,6 +25,11 @@ public class EffectivenessEvaluation {
     @Autowired
     private InvertedIndexer invertedIndexer;
 
+    public double meanReciprocalRank(String folderPath){
+        double count = 0.0;
+        double mean = 0.0;
+    }
+
     public double meanAveragePrecision(String folderPath){
         double count = 0.0;
         double totalPrecision = 0.0;
@@ -62,6 +67,44 @@ public class EffectivenessEvaluation {
         }
         mean = totalPrecision / relevantDocs.size();
         return mean;
+    }
+
+    public ArrayList<Double> listOfPrecision(List<String> lines){
+        ArrayList<Double> listOfPrecision = new ArrayList<>();
+        double count = 0.0;
+        double relevantCount = 0.0;
+        double totalPrecision;
+        String[] tuple;
+        tuple = lines.get(0).split(" ");
+        ArrayList<String> relevantDocs = getRelevance(Integer.parseInt(tuple[0]));
+        for (String line : lines) {
+            tuple = line.split(" ");
+            count += 1.0;
+            if(relevantDocs.contains(tuple[2])){
+                relevantCount += 1.0;
+                totalPrecision = (relevantCount / count);
+                listOfPrecision.add(totalPrecision);
+            }
+        }
+        return listOfPrecision;
+    }
+
+    public ArrayList<Double> listOfRecall(List<String> lines){
+        ArrayList<Double> listOfRecall = new ArrayList<>();
+        double relevantCount = 0.0;
+        double totalRecall;
+        String[] tuple;
+        tuple = lines.get(0).split(" ");
+        ArrayList<String> relevantDocs = getRelevance(Integer.parseInt(tuple[0]));
+        for (String line : lines) {
+            tuple = line.split(" ");
+            if(relevantDocs.contains(tuple[2])){
+                relevantCount += 1.0;
+                totalRecall = (relevantCount / relevantDocs.size());
+                listOfRecall.add(totalRecall);
+            }
+        }
+        return listOfRecall;
     }
 
     public ArrayList<String> getRelevance (int queryNumber){
