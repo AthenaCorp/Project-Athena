@@ -2,6 +2,8 @@ package athena.execute;
 
 import athena.index.InvertedIndexer;
 import athena.queryexpansion.PseudoRelevanceFeedback;
+import athena.retrievalmodel.RetrievalModel;
+import athena.retrievalmodel.RetrievalModels;
 import athena.utils.CommonUtils;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
@@ -29,6 +31,23 @@ public class SpringConfigurator {
         indexer.createIndex(inputFolder);
         long stopTime = commonUtils.printTimeStamp("Index Creation Completed");
         commonUtils.printTotalTime(startTime, stopTime);
+    }
+
+    public void retrieveRanking(String query) {
+        CommonUtils commonUtils = (CommonUtils) context.getBean("commonUtils");
+        long startTime = commonUtils.printTimeStamp("Ranking Started");
+        InvertedIndexer indexer = (InvertedIndexer) context.getBean("invertedIndexer");
+        String resourceFolder = commonUtils.getResourcePath();
+        String indexFolder = resourceFolder + properties.getProperty("search.engine.index.folder") + "\\";
+        indexer.setIndexFolder(indexFolder);
+        setRetrievalModel();
+        RetrievalModel retrievalModel = (RetrievalModel) context.getBean
+                ("retrievalModel");
+        PseudoRelevanceFeedback feedback = (PseudoRelevanceFeedback) context.getBean("pseudoRelevanceFeedback");
+        RetrievalModels.printN(retrievalModel.getRanking(query),4, 1);
+        long stopTime = commonUtils.printTimeStamp("Ranking Completed");
+        commonUtils.printTotalTime(startTime, stopTime);
+
     }
 
     public void executePseudoRelevanceFeedback() {
