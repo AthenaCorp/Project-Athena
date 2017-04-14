@@ -30,7 +30,7 @@ public class TextFileParser {
     public void splitTextFile(String filename) {
         String folderPath = commonUtils.getResourcePath()+
                 "cacm_stem\\";
-        CommonUtils.verifyFolder(folderPath);
+        commonUtils.verifyFolder(folderPath);
         String content = new String();
         String filenames = new String();
 
