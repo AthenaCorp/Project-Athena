@@ -25,11 +25,6 @@ public class EffectivenessEvaluation {
     @Autowired
     private InvertedIndexer invertedIndexer;
 
-    public double meanReciprocalRank(String folderPath){
-        double count = 0.0;
-        double mean = 0.0;
-    }
-
     public double meanAveragePrecision(String folderPath){
         double count = 0.0;
         double totalPrecision = 0.0;
@@ -50,22 +45,13 @@ public class EffectivenessEvaluation {
     }
 
     public double averagePrecision(List<String> lines){
-        double count = 0.0;
-        double relevantCount = 0.0;
         double totalPrecision = 0.0;
         double mean;
-        String[] tuple;
-        tuple = lines.get(0).split(" ");
-        ArrayList<String> relevantDocs = getRelevance(Integer.parseInt(tuple[0]));
-        for (String line : lines) {
-            tuple = line.split(" ");
-            count += 1.0;
-            if(relevantDocs.contains(tuple[2])){
-                relevantCount += 1.0;
-                totalPrecision += (relevantCount / count);
-            }
+        ArrayList<Double> lop = listOfPrecision(lines);
+        for (Double d : lop) {
+            totalPrecision += d;
         }
-        mean = totalPrecision / relevantDocs.size();
+        mean = totalPrecision / lop.size();
         return mean;
     }
 
