@@ -1,5 +1,6 @@
 package athena.execute;
 
+import athena.TextFileParser;
 import athena.index.InvertedIndexer;
 import athena.queryexpansion.PseudoRelevanceFeedback;
 import athena.retrievalmodel.RetrievalModel;
@@ -25,7 +26,14 @@ public class SpringConfigurator {
         long startTime = commonUtils.printTimeStamp("Index Creation Started");
         InvertedIndexer indexer = (InvertedIndexer) context.getBean("invertedIndexer");
         String resourceFolder = commonUtils.getResourcePath();
-        String inputFolder = resourceFolder + properties.getProperty("search.engine.input.folder") + "\\";
+        String inputFolder;
+        if(Boolean.getBoolean(properties.getProperty("search.engine.enable.stemming"))){
+            inputFolder = resourceFolder + properties.getProperty("search" +
+                    ".engine.steminput.folder") + "\\";
+        }
+        else {
+            inputFolder = resourceFolder + properties.getProperty("search.engine.input.folder") + "\\";
+        }
         String indexFolder = resourceFolder + properties.getProperty("search.engine.index.folder") + "\\";
         indexer.setIndexFolder(indexFolder);
         indexer.createIndex(inputFolder);
@@ -90,5 +98,10 @@ public class SpringConfigurator {
                 break;
         }
         context.setEnvironment(environment);
+    }
+
+    public void execStemFile(String filename){
+        TextFileParser t = (TextFileParser) context.getBean("textFileParser");
+        t.splitTextFile(filename);
     }
 }
