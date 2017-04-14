@@ -10,6 +10,7 @@ import athena.utils.CommonUtils;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
 
+import java.util.HashMap;
 import java.util.Properties;
 
 public class SpringConfigurator {
@@ -41,7 +42,17 @@ public class SpringConfigurator {
         commonUtils.printTotalTime(startTime, stopTime);
     }
 
-    public void retrieveRanking(String query, Integer count, Integer queryID) {
+    public void retrieveRanking(String query, Integer queryID) {
+        RetrievalModel retrievalModel = (RetrievalModel) context.getBean("retrievalModel");
+        if(properties.getProperty("search.engine.enable.query.expansion").equals("false")) {
+            retrievalModel.printN(retrievalModel.getRanking(query), queryID);
+        } else {
+            PseudoRelevanceFeedback feedback = (PseudoRelevanceFeedback) context.getBean("pseudoRelevanceFeedback");
+            retrievalModel.printN(feedback.getRanking(query), queryID);
+        }
+    }
+
+    public void executeQuerySearching() {
         CommonUtils commonUtils = (CommonUtils) context.getBean("commonUtils");
         long startTime = commonUtils.printTimeStamp("Ranking Started");
 
@@ -50,17 +61,15 @@ public class SpringConfigurator {
         String indexFolder = resourceFolder + properties.getProperty("search.engine.index.folder") + "\\";
         indexer.setIndexFolder(indexFolder);
         setRetrievalModel();
-        RetrievalModel retrievalModel = (RetrievalModel) context.getBean("retrievalModel");
-
-        if(properties.getProperty("search.engine.enable.query.expansion").equals("false")) {
-            RetrievalModels.printN(retrievalModel.getRanking(query), count, queryID, retrievalModel.getModelName());
-        } else {
-            PseudoRelevanceFeedback feedback = (PseudoRelevanceFeedback) context.getBean("pseudoRelevanceFeedback");
-            RetrievalModels.printN(feedback.getRanking(query), count, queryID, retrievalModel.getModelName());
+        HashMap<Integer, String> queries = new HashMap<>();
+        queries.put(1, "Algorithms for parallel computation, and especially comparisons between parallel and sequential algorithms.");
+        queries.put(2, "I am interested in articles written either by Prieve or Udo Pooch");
+        queries.put(3, "List all articles on EL1 and ECL (EL1 may be given as EL/1; I don't remember how they did it.");
+        for (Integer q : queries.keySet()) {
+            retrieveRanking(queries.get(q), q);
         }
         long stopTime = commonUtils.printTimeStamp("Ranking Completed");
         commonUtils.printTotalTime(startTime, stopTime);
-
     }
 
     public void executePseudoRelevanceFeedback() {
@@ -115,6 +124,6 @@ public class SpringConfigurator {
         EffectivenessEvaluation e = (EffectivenessEvaluation) context.getBean
                 ("effectivenessEvaluation");
         //e.meanAveragePrecision("Task2_1.txt");
-        System.out.println(e.meanAveragePrecision("folderpath"));
+        System.out.println(e.meanAveragePrecision("BM25"));
     }
 }

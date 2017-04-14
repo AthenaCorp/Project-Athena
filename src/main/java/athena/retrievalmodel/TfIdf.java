@@ -1,8 +1,11 @@
 package athena.retrievalmodel;
 
 import athena.index.InvertedIndexer;
+import athena.utils.CommonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Set;
 
@@ -15,6 +18,10 @@ public class TfIdf implements RetrievalModel {
 
     @Autowired
     private InvertedIndexer invertedIndexer;
+    @Autowired
+    private CommonUtils commonUtils;
+    @Value("${search.engine.print.size}")
+    private Integer printSize;
 
     private HashMap<String, Double> tfIdfMap = new HashMap<>();
     private HashMap<String, HashMap<String, Integer>> index;
@@ -72,5 +79,16 @@ public class TfIdf implements RetrievalModel {
     private void setIndexAndTokenMap() {
         index = invertedIndexer.readIndexFromJsonFile();
         tokenCountMap = invertedIndexer.readTokenCountToJsonFile();
+    }
+
+    @Override
+    public void printN(HashMap<String, Double> hashMap, Integer queryID) {
+        String fs = File.separator;
+        String folderName = commonUtils.getOutputPath() + fs + getModelName() + fs;
+        commonUtils.verifyFolder(folderName);
+        String filePath = folderName + queryID + ".txt";
+
+
+        RetrievalModels.printN(hashMap, queryID, filePath, getModelName(), printSize);
     }
 }

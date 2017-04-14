@@ -10,7 +10,6 @@ import java.util.*;
  * Created by Pallav on 4/8/2017.
  */
 public class RetrievalModels {
-
     private static final String SPLIT_CHARACTER = " ";
 
     // Split the whole query into separate words and counts
@@ -47,19 +46,17 @@ public class RetrievalModels {
         return hashMap1;
     }
 
-    // Prints the scores in a proper given format
-    public static void printN(HashMap<String, Double> hashMap, Integer count, Integer queryID, String model) {
+    public static void printN(HashMap<String, Double> hashMap, Integer queryID, String filePath, String model, Integer printSize) {
         int k = 1;
-
         DecimalFormat numberFormat = new DecimalFormat("#.000");
-        File file = new File("Task2_" + queryID + ".txt");
+        File file = new File(filePath);
         try {
             FileWriter fileWriter = new FileWriter(file);
             for (String s : hashMap.keySet()) {
                 fileWriter.write(queryID + " Q0 " + s + " " + k + " " + numberFormat.format(hashMap.get(s)) +
-                        " Athena [" + model + "]\n");
+                        " Athena[" + model + "]\n");
                 k++;
-                if (k > count) {
+                if (k > printSize) {
                     break;
                 }
             }
