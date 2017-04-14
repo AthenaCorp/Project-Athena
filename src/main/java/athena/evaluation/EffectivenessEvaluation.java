@@ -3,9 +3,11 @@ package athena.evaluation;
 import athena.crawler.CrawlerUtils;
 import athena.index.InvertedIndexer;
 import athena.utils.CommonUtils;
+import org.jsoup.Jsoup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -23,22 +25,43 @@ public class EffectivenessEvaluation {
     @Autowired
     private InvertedIndexer invertedIndexer;
 
-    public ArrayList<ArrayList> getAllQueries(String filename){
-        List<String> lines = getTextFromFile(filename);
-        String[] tuple;
-        ArrayList<String> relevantDocs;
-        int count = 0;
-        for (String line : lines) {
-            tuple = line.split(" ");
-            if(Integer.parseInt(tuple[0])!=count){
-                count = Integer.parseInt(tuple[0]);
-                relevantDocs = getRelevance(count);
+    public double meanAveragePrecision(String folderPath){
+        double count = 0.0;
+        double totalPrecision = 0.0;
+        double mean = 0.0;
+        File folder = new File(folderPath);
+        File[] files = folder.listFiles();
+        if (files == null) {
+            System.out.println("No files present or invalid folder");
+        } else {
+            for (File file : files) {
+                List<String> lines = getTextFromFile(file.getName());
+                totalPrecision += averagePrecision(lines);
+                count++;
             }
         }
-        Double precision = 0.0;
-        Double recall;
+        mean = totalPrecision / count;
+        return mean;
+    }
 
-        System.out.println(precision);
+    public double averagePrecision(List<String> lines){
+        double count = 0.0;
+        double relevantCount = 0.0;
+        double totalPrecision = 0.0;
+        double mean;
+        String[] tuple;
+        tuple = lines.get(0).split(" ");
+        ArrayList<String> relevantDocs = getRelevance(Integer.parseInt(tuple[0]));
+        for (String line : lines) {
+            tuple = line.split(" ");
+            count += 1.0;
+            if(relevantDocs.contains(tuple[2])){
+                relevantCount += 1.0;
+                totalPrecision += (relevantCount / count);
+            }
+        }
+        mean = totalPrecision / relevantDocs.size();
+        return mean;
     }
 
     public ArrayList<String> getRelevance (int queryNumber){

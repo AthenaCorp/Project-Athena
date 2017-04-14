@@ -115,6 +115,6 @@ public class SpringConfigurator {
         EffectivenessEvaluation e = (EffectivenessEvaluation) context.getBean
                 ("effectivenessEvaluation");
         //e.meanAveragePrecision("Task2_1.txt");
-        System.out.println(e.getRelevance(1));
+        System.out.println(e.meanAveragePrecision("folderpath"));
     }
 }
