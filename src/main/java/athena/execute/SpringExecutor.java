@@ -5,6 +5,6 @@ public class SpringExecutor {
         SpringConfigurator configurator = new SpringConfigurator();
         configurator.execStemFile("cacm_stem.txt");
         configurator.generateIndex();
-        configurator.retrieveRanking("samelson");
+        configurator.retrieveRanking("samelson", 10, 1);
     }
 }

@@ -125,7 +125,7 @@ public class InvertedIndexer {
         return StringUtils.replace(text, "  ", STRING_REPLACEMENT);
     }
 
-    public HashMap<String, HashMap<String, Integer>> createIndex(File[] files) {
+    public HashMap<String, HashMap<String, Integer>> createIndex(File[] files, Boolean writeFlag) {
         HashMap<String, HashMap<String, Integer>> index = new HashMap<>();
         HashMap<String, Integer> terms;
         HashMap<String, Integer> tokenCountMap = new HashMap<>();
@@ -166,8 +166,10 @@ public class InvertedIndexer {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        writeIndexToJsonFile(index);
-        writeTokenCountToJsonFile(tokenCountMap);
+        if(writeFlag) {
+            writeIndexToJsonFile(index);
+            writeTokenCountToJsonFile(tokenCountMap);
+        }
         return index;
     }
 
@@ -175,7 +177,7 @@ public class InvertedIndexer {
         tokenizeHTMLFiles(inputFolder);
         File folder = new File(dataFolder);
         File[] files = folder.listFiles();
-        createIndex(files);
+        createIndex(files, true);
     }
 
     private List<String> getValidWords(String[] strings) {
