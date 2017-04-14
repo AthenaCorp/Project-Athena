@@ -9,12 +9,12 @@ import java.util.*;
 /**
  * Created by Pallav on 4/8/2017.
  */
-public class RetrievalModelImp implements RetrievalModel {
+public class RetrievalModels {
 
+    private static final String SPLIT_CHARACTER = " ";
 
-    String SPLIT_CHARACTER = " ";
-    @Override
-    public HashMap<String, Integer> getQueryMap(String query) {
+    // Split the whole query into separate words and counts
+    public static HashMap<String, Integer> getQueryMap(String query) {
         HashMap<String, Integer> hashMap = new HashMap<>();
         String[] strings = query.split(SPLIT_CHARACTER);
         for (String s : strings) {
@@ -27,8 +27,8 @@ public class RetrievalModelImp implements RetrievalModel {
         return hashMap;
     }
 
-    @Override
-    public double getAverageTokenCount(HashMap<String, Integer> tokenCount) {
+    // For a given map, calculates the average token count
+    public static double getAverageTokenCount(HashMap<String, Integer> tokenCount) {
         Integer totalTokenCount = 0;
         for (String s : tokenCount.keySet()) {
             totalTokenCount += tokenCount.get(s);
@@ -36,8 +36,8 @@ public class RetrievalModelImp implements RetrievalModel {
         return ((double) totalTokenCount / tokenCount.size());
     }
 
-    @Override
-    public HashMap<String, Double> sortBM(HashMap<String, Double> hashMap) {
+    // For a given map, sorts according to the values
+    public static HashMap<String, Double> sortBM(HashMap<String, Double> hashMap) {
         List<Map.Entry<String, Double>> entrySet = new ArrayList<>(hashMap.entrySet());
         entrySet.sort((a, b) -> Double.compare(b.getValue(), a.getValue()));
         HashMap<String, Double> hashMap1 = new LinkedHashMap<>();
@@ -47,8 +47,8 @@ public class RetrievalModelImp implements RetrievalModel {
         return hashMap1;
     }
 
-    @Override
-    public void printN(HashMap<String, Double> hashMap, Integer count, Integer queryID) {
+    // Prints the scores in a proper given format
+    public static void printN(HashMap<String, Double> hashMap, Integer count, Integer queryID) {
         int length = 60;
         int k = 1;
         String s1;

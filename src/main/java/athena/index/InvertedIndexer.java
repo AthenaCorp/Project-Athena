@@ -9,12 +9,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
 import java.io.*;
 import java.util.*;
 
-@Component
 public class InvertedIndexer {
 
     @Value("${search.engine.ngrams}")
@@ -33,6 +31,7 @@ public class InvertedIndexer {
 
     @Autowired
     private CrawlerUtils crawlerUtils;
+
 
     public InvertedIndexer() {
         CommonUtils commonUtils = new CommonUtils();
@@ -71,6 +70,8 @@ public class InvertedIndexer {
             } else {
                 for (File file : files) {
                     content = Jsoup.parse(file, FILE_ENCODING).text();
+                    content = removeNumbers(content);
+                    System.out.println(content);
                     if (doCaseFold) {
                         content = caseFoldText(content);
                     }
@@ -83,6 +84,27 @@ public class InvertedIndexer {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private String removeNumbers(String content) {
+        String newContent = "";
+        try {
+            int i = 0;
+            BufferedReader br = new BufferedReader(new StringReader(content));
+            String line = br.readLine();
+            while (line != null) {
+                if (line.matches("[0-9\t]+")) {
+                    //System.out.println("Line " + i + ": " + line);
+                } else {
+                    newContent += line + " ";
+                }
+                line = br.readLine();
+                i++;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return newContent;
     }
 
     private String formatFileName(String fileName) {

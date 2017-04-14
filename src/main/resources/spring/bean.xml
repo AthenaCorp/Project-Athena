@@ -2,12 +2,24 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
       http://www.springframework.org/schema/beans/spring-beans.xsd
   	  http://www.springframework.org/schema/context
-      http://www.springframework.org/schema/context/spring-context.xsd">
+      http://www.springframework.org/schema/context/spring-context.xsd
+      http://www.springframework.org/schema/util
+      http://www.springframework.org/schema/util/spring-util.xsd">
 
-    <bean id="commonUtils" class="athena.utils.CommonUtils"/>
-    <context:component-scan base-package="athena"/>
+    <util:properties id="searchEngineProperties" location="properties/searchengine.properties" />
     <context:property-placeholder location="properties/searchengine.properties"/>
+
+    <beans profile="default">
+        <bean id="commonUtils" class="athena.utils.CommonUtils"/>
+        <bean id="invertedIndexer" class="athena.index.InvertedIndexer" depends-on="commonUtils"/>
+        <bean id="retrievalModel" class="athena.retrievalmodel.BM25"/>
+        <context:component-scan base-package="athena"/>
+    </beans>
+    <beans profile="tfidf">
+        <bean id="retrievalModel" class="athena.retrievalmodel.TfIdf"/>
+    </beans>
 </beans>

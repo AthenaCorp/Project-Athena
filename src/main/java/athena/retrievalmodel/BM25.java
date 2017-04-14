@@ -1,6 +1,7 @@
 package athena.retrievalmodel;
 
 import athena.index.InvertedIndexer;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -9,25 +10,30 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.*;
 
-@Component
-public class BM25 extends RetrievalModelImp {
+public class BM25 implements RetrievalModel {
+
+    @Autowired
+    private InvertedIndexer invertedIndexer;
 
     private static final Integer K2 = 100;
     private static final Double K1 = 1.2;
     private static final Double B = 0.75;
-    private static final String SPILT_CHARACTER = " ";
 
-    public HashMap<String, Double> calculateBM25(String query) {
+
+    public HashMap<String, Double> getRanking(String query) {
+        return calculateBM25(query);
+    }
+
+    private HashMap<String, Double> calculateBM25(String query) {
         HashMap<String, Double> bm25Map = new HashMap<>();
-        InvertedIndexer invertedIndexer = new InvertedIndexer();
         HashMap<String, HashMap<String, Integer>> index = invertedIndexer.readIndexFromJsonFile();
         HashMap<String, Integer> tokenCountMap = invertedIndexer.readTokenCountToJsonFile();
-        Double averageTokenCount = getAverageTokenCount(tokenCountMap);
+        Double averageTokenCount = RetrievalModels.getAverageTokenCount(tokenCountMap);
         Integer totalDocumentCount = tokenCountMap.size();
 
         HashMap<String, Integer> terms;
         Set<String> termKeySet;
-        HashMap<String, Integer> queryMap = getQueryMap(query);
+        HashMap<String, Integer> queryMap = RetrievalModels.getQueryMap(query);
         Set<String> queryWords = queryMap.keySet();
 
         for (String s : queryWords) {
@@ -35,8 +41,8 @@ public class BM25 extends RetrievalModelImp {
             if (terms != null) {
                 termKeySet = terms.keySet();
                 Integer termDocumentCount = termKeySet.size();
-                Integer termQueryCount = queryMap.get(s);
                 for (String t : termKeySet) {
+                Integer termQueryCount = queryMap.get(s);
                     Double value = Math.log((totalDocumentCount - termDocumentCount + 0.5) / (termDocumentCount + 0.5));
                     value = value * (((K1 + 1) * terms.get(t)) / (calculateK(tokenCountMap.get(t), averageTokenCount) +
                             terms.get(t)));
@@ -50,7 +56,7 @@ public class BM25 extends RetrievalModelImp {
             }
         }
 
-        return sortBM(bm25Map);
+        return RetrievalModels.sortBM(bm25Map);
     }
 
     private Double calculateK(Integer documentLength, Double averageLength) {

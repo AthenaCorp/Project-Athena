@@ -1,6 +1,7 @@
 package athena.execute;
 
 import athena.retrievalmodel.BM25;
+import athena.retrievalmodel.RetrievalModels;
 import athena.retrievalmodel.TfIdf;
 import athena.utils.CommonUtils;
 import athena.queryexpansion.PsFeedback;
@@ -21,10 +22,7 @@ public class Executor {
     }
 
     public void executePS() {
-
-        System.out.println(PsFeedback.expandQuery("samelson"));
-
-
+        //System.out.println(PsFeedback.expandQuery("samelson"));
     }
 
     public void executeBM25() {
@@ -40,8 +38,8 @@ public class Executor {
         queries.put(4, "light bulb bulbs alternative alternatives");
 
         for(Integer i : queries.keySet()) {
-            HashMap<String, Double> bm = bm25.calculateBM25(queries.get(i));
-            bm25.printN(bm, 100, i);
+            HashMap<String, Double> bm = bm25.getRanking(queries.get(i));
+            RetrievalModels.printN(bm, 100, i);
         }
 
         long stopTime = commonUtils.printTimeStamp("Index Creation Completed");
@@ -62,8 +60,8 @@ public class Executor {
         queries.put(4, "light bulb bulbs alternative alternatives");
 
         for(Integer i : queries.keySet()) {
-            HashMap<String, Double> tidf = tfIdf.calculateTfIdf(queries.get(i));
-            bm25.printN(tidf, 100, i);
+            HashMap<String, Double> tidf = tfIdf.getRanking(queries.get(i));
+            RetrievalModels.printN(tidf, 100, i);
         }
 
         long stopTime = commonUtils.printTimeStamp("Index Creation Completed");
