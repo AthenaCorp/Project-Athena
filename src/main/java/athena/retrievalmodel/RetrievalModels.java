@@ -49,22 +49,15 @@ public class RetrievalModels {
 
     // Prints the scores in a proper given format
     public static void printN(HashMap<String, Double> hashMap, Integer count, Integer queryID, String model) {
-        int length = 20;
         int k = 1;
-        String s1;
-        // Interstellar
 
         DecimalFormat numberFormat = new DecimalFormat("#.000");
         File file = new File("Task2_" + queryID + ".txt");
         try {
             FileWriter fileWriter = new FileWriter(file);
             for (String s : hashMap.keySet()) {
-                s1 = s;
-                while (length > s1.length()) {
-                    s1 = s1 + " ";
-                }
-                fileWriter.write(queryID + "\tQ0   " + s1 + k + "\t\t" + numberFormat.format(hashMap.get(s)) +
-                        "  Athena [" + model + "]\n");
+                fileWriter.write(queryID + " Q0 " + s + " " + k + " " + numberFormat.format(hashMap.get(s)) +
+                        " Athena [" + model + "]\n");
                 k++;
                 if (k > count) {
                     break;
