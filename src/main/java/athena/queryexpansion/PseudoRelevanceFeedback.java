@@ -28,8 +28,7 @@ public class PseudoRelevanceFeedback {
         File[] files = new File[keySet.size()];
         int i = 0;
         for (String s : keySet) {
-            files[i] = new File(invertedIndexer.getDataFolder() + s + ".txt");
-            i++;
+            files[i++] = new File(invertedIndexer.getDataFolder() + s + ".txt");
         }
         HashMap<String, HashMap<String, Integer>> topDocs = invertedIndexer.createIndex(files);
         HashMap<String, Integer> termFrequencyTable = invertedIndexer.generateTermFrequencyTable(topDocs);

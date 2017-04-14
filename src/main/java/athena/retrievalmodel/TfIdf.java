@@ -62,6 +62,11 @@ public class TfIdf implements RetrievalModel {
         return calculateTfIdf(query);
     }
 
+    @Override
+    public String getModelName() {
+        return "Tf-idf";
+    }
+
     private void setIndexAndTokenMap() {
         index = invertedIndexer.readIndexFromJsonFile();
         tokenCountMap = invertedIndexer.readTokenCountToJsonFile();

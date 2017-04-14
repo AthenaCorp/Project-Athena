@@ -18,7 +18,6 @@ public class SpringConfigurator {
     public SpringConfigurator() {
         context = new ClassPathXmlApplicationContext("spring/bean.xml");
         properties = (Properties) context.getBean("searchEngineProperties");
-        context.refresh();
     }
 
     public void generateIndex() {
@@ -49,10 +48,9 @@ public class SpringConfigurator {
         String indexFolder = resourceFolder + properties.getProperty("search.engine.index.folder") + "\\";
         indexer.setIndexFolder(indexFolder);
         setRetrievalModel();
-        RetrievalModel retrievalModel = (RetrievalModel) context.getBean
-                ("retrievalModel");
+        RetrievalModel retrievalModel = (RetrievalModel) context.getBean("retrievalModel");
         PseudoRelevanceFeedback feedback = (PseudoRelevanceFeedback) context.getBean("pseudoRelevanceFeedback");
-        RetrievalModels.printN(retrievalModel.getRanking(query),4, 1);
+        RetrievalModels.printN(retrievalModel.getRanking(query), 5, 1, retrievalModel.getModelName());
         long stopTime = commonUtils.printTimeStamp("Ranking Completed");
         commonUtils.printTotalTime(startTime, stopTime);
 
@@ -98,6 +96,7 @@ public class SpringConfigurator {
                 break;
         }
         context.setEnvironment(environment);
+        context.refresh();
     }
 
     public void execStemFile(String filename){

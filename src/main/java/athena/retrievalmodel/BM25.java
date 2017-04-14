@@ -2,13 +2,9 @@ package athena.retrievalmodel;
 
 import athena.index.InvertedIndexer;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.text.DecimalFormat;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Set;
 
 public class BM25 implements RetrievalModel {
 
@@ -22,6 +18,11 @@ public class BM25 implements RetrievalModel {
 
     public HashMap<String, Double> getRanking(String query) {
         return calculateBM25(query);
+    }
+
+    @Override
+    public String getModelName() {
+        return "BM25";
     }
 
     private HashMap<String, Double> calculateBM25(String query) {

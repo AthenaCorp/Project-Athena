@@ -32,12 +32,11 @@ public class InvertedIndexer {
 
     @Autowired
     private CrawlerUtils crawlerUtils;
-
+    private  CommonUtils commonUtils = new CommonUtils();
 
     public InvertedIndexer() {
-        CommonUtils commonUtils = new CommonUtils();
         this.indexFolder = commonUtils.getResourcePath() + FOLDER_INDEX;
-        CommonUtils.verifyFolder(indexFolder);
+        commonUtils.verifyFolder(indexFolder);
         setDataFolder(indexFolder);
     }
 
@@ -47,13 +46,13 @@ public class InvertedIndexer {
 
     public void setIndexFolder(String indexFolder) {
         this.indexFolder = indexFolder;
-        CommonUtils.verifyFolder(indexFolder);
+        commonUtils.verifyFolder(indexFolder);
         setDataFolder(indexFolder);
     }
 
     private void setDataFolder(String indexFolder) {
         this.dataFolder = indexFolder + "DataFiles\\";
-        CommonUtils.verifyFolder(dataFolder);
+        commonUtils.verifyFolder(dataFolder);
     }
 
 

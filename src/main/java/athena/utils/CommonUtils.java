@@ -17,10 +17,13 @@ public class CommonUtils {
     private static final int TIME_FACTOR = 60;
     private String projectPath;
     private String resourcePath;
+    private String outputPath;
 
     public CommonUtils() {
         setProjectPath();
         setResourcePath();
+        setOutputPath();
+        verifyFolder(getOutputPath());
     }
 
     public List<Element> extractLinks(Document document) {
@@ -95,6 +98,11 @@ public class CommonUtils {
         resourcePath = projectPath + "src" + fs + "main" + fs + "resources" + fs;
     }
 
+    private void setOutputPath() {
+        String fs = File.separator;
+        outputPath = projectPath + "target" + fs + "output" + fs;
+    }
+
     public String getProjectPath() {
         return projectPath;
     }
@@ -103,7 +111,11 @@ public class CommonUtils {
         return resourcePath;
     }
 
-    public static void verifyFolder(String folder) {
+    public String getOutputPath() {
+        return outputPath;
+    }
+
+    public void verifyFolder(String folder) {
         File file = new File(folder);
         if(!file.exists()) {
             if(file.mkdir()) {

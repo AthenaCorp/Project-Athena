@@ -48,8 +48,8 @@ public class RetrievalModels {
     }
 
     // Prints the scores in a proper given format
-    public static void printN(HashMap<String, Double> hashMap, Integer count, Integer queryID) {
-        int length = 60;
+    public static void printN(HashMap<String, Double> hashMap, Integer count, Integer queryID, String model) {
+        int length = 20;
         int k = 1;
         String s1;
         // Interstellar
@@ -63,7 +63,8 @@ public class RetrievalModels {
                 while (length > s1.length()) {
                     s1 = s1 + " ";
                 }
-                fileWriter.write(queryID + "\tQ0   " + s1 + k + "\t\t" + numberFormat.format(hashMap.get(s)) + "  Normandy\n");
+                fileWriter.write(queryID + "\tQ0   " + s1 + k + "\t\t" + numberFormat.format(hashMap.get(s)) +
+                        "  Athena [" + model + "]\n");
                 k++;
                 if (k > count) {
                     break;
