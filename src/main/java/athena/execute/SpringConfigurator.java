@@ -1,6 +1,7 @@
 package athena.execute;
 
 import athena.TextFileParser;
+import athena.evaluation.EffectivenessEvaluation;
 import athena.index.InvertedIndexer;
 import athena.queryexpansion.PseudoRelevanceFeedback;
 import athena.retrievalmodel.RetrievalModel;
@@ -102,5 +103,12 @@ public class SpringConfigurator {
     public void execStemFile(String filename){
         TextFileParser t = (TextFileParser) context.getBean("textFileParser");
         t.splitTextFile(filename);
+    }
+
+    public void execEval(){
+        EffectivenessEvaluation e = (EffectivenessEvaluation) context.getBean
+                ("effectivenessEvaluation");
+        //e.meanAveragePrecision("Task2_1.txt");
+        System.out.println(e.getRelevance(1));
     }
 }

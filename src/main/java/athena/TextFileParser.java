@@ -15,10 +15,6 @@ import java.util.List;
 @Component
 
 public class TextFileParser {
-    private final static String FOLDER_INDEX = "\\Athena\\";
-    private final static String FILE_ENCODING = "UTF-8";
-    private final static String STRING_REPLACEMENT = " ";
-    private final static String STRING_SPLIT = " ";
 
     @Autowired
     private CrawlerUtils crawlerUtils;

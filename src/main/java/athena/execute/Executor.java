@@ -1,6 +1,7 @@
 package athena.execute;
 
 import athena.TextFileParser;
+import athena.evaluation.EffectivenessEvaluation;
 import athena.retrievalmodel.BM25;
 import athena.retrievalmodel.RetrievalModels;
 import athena.retrievalmodel.TfIdf;
@@ -18,7 +19,7 @@ public class Executor {
         //executor.executeTask3();
 //        executor.executeBM25();
         //executor.executeTfIdf();
-        executor.executePS();
+        //executor.executePS();
     }
 
     public void executePS() {
