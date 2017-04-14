@@ -1,7 +1,7 @@
 package athena.execute;
 
 import athena.index.InvertedIndexer;
-import athena.queryexpansion.PsFeedback;
+import athena.queryexpansion.PseudoRelevanceFeedback;
 import athena.utils.CommonUtils;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
@@ -34,8 +34,7 @@ public class SpringConfigurator {
         context.refresh();
     }
 
-
-    public void executeIndex() {
+    public void generateIndex() {
         CommonUtils commonUtils = (CommonUtils) context.getBean("commonUtils");
         long startTime = commonUtils.printTimeStamp("Index Creation Started");
         InvertedIndexer indexer = (InvertedIndexer) context.getBean("invertedIndexer");
@@ -48,14 +47,14 @@ public class SpringConfigurator {
         commonUtils.printTotalTime(startTime, stopTime);
     }
 
-    public void executeExpand() {
+    public void executePseudoRelevanceFeedback() {
         CommonUtils commonUtils = (CommonUtils) context.getBean("commonUtils");
         long startTime = commonUtils.printTimeStamp("Query Expansion Started");
         InvertedIndexer indexer = (InvertedIndexer) context.getBean("invertedIndexer");
         indexer.setIndexFolder(commonUtils.getResourcePath() + "athena\\");
 
-        PsFeedback psFeedback = (PsFeedback) context.getBean("psFeedback");
-        System.out.println(psFeedback.expandQuery("samelson"));
+        PseudoRelevanceFeedback feedback = (PseudoRelevanceFeedback) context.getBean("pseudoRelevanceFeedback");
+        System.out.println(feedback.expandQuery("samelson"));
         long stopTime = commonUtils.printTimeStamp("Query Expansion Completed");
         commonUtils.printTotalTime(startTime, stopTime);
     }

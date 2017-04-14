@@ -4,7 +4,6 @@ import athena.retrievalmodel.BM25;
 import athena.retrievalmodel.RetrievalModels;
 import athena.retrievalmodel.TfIdf;
 import athena.utils.CommonUtils;
-import athena.queryexpansion.PsFeedback;
 
 import java.util.HashMap;
 
