@@ -32,7 +32,9 @@ public class TfIdf implements RetrievalModel {
                 double idf = calculateIdf(q, totalDocumentSize);
                 tfIdfScore += tf * idf;
             }
-            tfIdfMap.put(s, tfIdfScore);
+            if (tfIdfScore != 0) {
+                tfIdfMap.put(s, tfIdfScore);
+            }
         }
         return RetrievalModels.sortBM(tfIdfMap);
     }
@@ -46,7 +48,7 @@ public class TfIdf implements RetrievalModel {
             double totalTerms = tokenCountMap.get(docId);
             return num / totalTerms;
         } else {
-            return 1;
+            return 0;
         }
     }
 

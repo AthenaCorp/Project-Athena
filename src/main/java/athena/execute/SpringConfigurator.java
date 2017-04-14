@@ -41,17 +41,23 @@ public class SpringConfigurator {
         commonUtils.printTotalTime(startTime, stopTime);
     }
 
-    public void retrieveRanking(String query) {
+    public void retrieveRanking(String query, Integer count, Integer queryID) {
         CommonUtils commonUtils = (CommonUtils) context.getBean("commonUtils");
         long startTime = commonUtils.printTimeStamp("Ranking Started");
+
         InvertedIndexer indexer = (InvertedIndexer) context.getBean("invertedIndexer");
         String resourceFolder = commonUtils.getResourcePath();
         String indexFolder = resourceFolder + properties.getProperty("search.engine.index.folder") + "\\";
         indexer.setIndexFolder(indexFolder);
         setRetrievalModel();
         RetrievalModel retrievalModel = (RetrievalModel) context.getBean("retrievalModel");
-        PseudoRelevanceFeedback feedback = (PseudoRelevanceFeedback) context.getBean("pseudoRelevanceFeedback");
-        RetrievalModels.printN(retrievalModel.getRanking(query), 5, 1, retrievalModel.getModelName());
+
+        if(properties.getProperty("search.engine.enable.query.expansion").equals("false")) {
+            RetrievalModels.printN(retrievalModel.getRanking(query), count, queryID, retrievalModel.getModelName());
+        } else {
+            PseudoRelevanceFeedback feedback = (PseudoRelevanceFeedback) context.getBean("pseudoRelevanceFeedback");
+            RetrievalModels.printN(feedback.getRanking(query), count, queryID, retrievalModel.getModelName());
+        }
         long stopTime = commonUtils.printTimeStamp("Ranking Completed");
         commonUtils.printTotalTime(startTime, stopTime);
 
