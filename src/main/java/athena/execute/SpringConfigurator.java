@@ -14,23 +14,7 @@ public class SpringConfigurator {
 
     public SpringConfigurator() {
         context = new ClassPathXmlApplicationContext("spring/bean.xml");
-        ConfigurableEnvironment environment = context.getEnvironment();
         properties = (Properties) context.getBean("searchEngineProperties");
-        environment.addActiveProfile("default");
-        String retrievalModel = properties.getProperty("search.engine.retrieval.model");
-        switch (retrievalModel.toLowerCase()) {
-            case "tfidf":
-                environment.addActiveProfile("tfidf");
-                System.out.println("Using RetrievalModel : " + retrievalModel);
-                break;
-            case "bm25":
-                System.out.println("Using RetrievalModel : " + retrievalModel);
-                break;
-            default:
-                System.out.println("Using Default RetrievalModel : BM25");
-                break;
-        }
-        context.setEnvironment(environment);
         context.refresh();
     }
 
@@ -51,8 +35,10 @@ public class SpringConfigurator {
         CommonUtils commonUtils = (CommonUtils) context.getBean("commonUtils");
         long startTime = commonUtils.printTimeStamp("Query Expansion Started");
         InvertedIndexer indexer = (InvertedIndexer) context.getBean("invertedIndexer");
-        indexer.setIndexFolder(commonUtils.getResourcePath() + "athena\\");
-
+        String resourceFolder = commonUtils.getResourcePath();
+        String indexFolder = resourceFolder + properties.getProperty("search.engine.index.folder") + "\\";
+        indexer.setIndexFolder(indexFolder);
+        setRetrievalModel();
         PseudoRelevanceFeedback feedback = (PseudoRelevanceFeedback) context.getBean("pseudoRelevanceFeedback");
         System.out.println(feedback.expandQuery("samelson"));
         long stopTime = commonUtils.printTimeStamp("Query Expansion Completed");
@@ -65,5 +51,25 @@ public class SpringConfigurator {
 
     public Properties getProperties() {
         return properties;
+    }
+
+    public void setRetrievalModel() {
+        ConfigurableEnvironment environment = context.getEnvironment();
+        environment.addActiveProfile("default");
+        String retrievalModel = properties.getProperty("search.engine.retrieval.model");
+        switch (retrievalModel.toLowerCase()) {
+            case "tfidf":
+                environment.addActiveProfile("tfidf");
+                System.out.println("Using " + retrievalModel + " Retrieval Model");
+                break;
+            case "bm25":
+                System.out.println("Using " + retrievalModel + " Retrieval Model");
+                break;
+            default:
+                System.err.println("Invalid Retrieval Model : " + retrievalModel);
+                System.out.println("Using Default [BM25] RetrievalModel");
+                break;
+        }
+        context.setEnvironment(environment);
     }
 }

@@ -28,6 +28,7 @@ public class InvertedIndexer {
     private final static String FOLDER_INDEX = "\\Athena\\";
     private final static String FILE_ENCODING = "UTF-8";
     private final static String STRING_REPLACEMENT = " ";
+    private final static String STRING_SPLIT = " ";
 
     @Autowired
     private CrawlerUtils crawlerUtils;
@@ -71,7 +72,6 @@ public class InvertedIndexer {
                 for (File file : files) {
                     content = Jsoup.parse(file, FILE_ENCODING).text();
                     content = removeNumbers(content);
-                    System.out.println(content);
                     if (doCaseFold) {
                         content = caseFoldText(content);
                     }
@@ -89,17 +89,13 @@ public class InvertedIndexer {
     private String removeNumbers(String content) {
         String newContent = "";
         try {
-            int i = 0;
             BufferedReader br = new BufferedReader(new StringReader(content));
             String line = br.readLine();
             while (line != null) {
-                if (line.matches("[0-9\t]+")) {
-                    //System.out.println("Line " + i + ": " + line);
-                } else {
+                if (!line.matches("[0-9\t]+")) {
                     newContent += line + " ";
                 }
                 line = br.readLine();
-                i++;
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -144,7 +140,7 @@ public class InvertedIndexer {
                 BufferedReader br = new BufferedReader(fileReader);
                 String currentLine = br.readLine();
                 if (currentLine != null) {
-                    words = getValidWords(currentLine.split(" "));
+                    words = getValidWords(currentLine.split(STRING_SPLIT));
                     tokenCount = words.size() - nGrams;
                     for (int i = 0; i <= tokenCount; i++) {
                         word = words.get(i);
@@ -171,7 +167,6 @@ public class InvertedIndexer {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        //System.out.println("Index Size : " + index.size());
         writeIndexToJsonFile(index);
         writeTokenCountToJsonFile(tokenCountMap);
         return index;
