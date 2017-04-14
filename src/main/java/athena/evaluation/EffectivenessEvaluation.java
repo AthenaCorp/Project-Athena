@@ -25,17 +25,19 @@ public class EffectivenessEvaluation {
     @Autowired
     private InvertedIndexer invertedIndexer;
 
-    public double meanAveragePrecision(String folderPath){
+    public double meanAveragePrecision(String folderPath) {
         double count = 0.0;
         double totalPrecision = 0.0;
-        double mean = 0.0;
+        double mean;
+        String fs = File.separator;
+        folderPath = commonUtils.getOutputPath() + fs + folderPath;
         File folder = new File(folderPath);
         File[] files = folder.listFiles();
         if (files == null) {
             System.out.println("No files present or invalid folder");
         } else {
             for (File file : files) {
-                List<String> lines = getTextFromFile(file.getName());
+                List<String> lines = getTextFromFile(folderPath + fs + file.getName());
                 totalPrecision += averagePrecision(lines);
                 count++;
             }
@@ -68,29 +70,11 @@ public class EffectivenessEvaluation {
             count += 1.0;
             if(relevantDocs.contains(tuple[2])){
                 relevantCount += 1.0;
-                totalPrecision = (relevantCount / count);
-                listOfPrecision.add(totalPrecision);
+                totalPrecision += (relevantCount / count);
             }
         }
-        return listOfPrecision;
-    }
-
-    public ArrayList<Double> listOfRecall(List<String> lines){
-        ArrayList<Double> listOfRecall = new ArrayList<>();
-        double relevantCount = 0.0;
-        double totalRecall;
-        String[] tuple;
-        tuple = lines.get(0).split(" ");
-        ArrayList<String> relevantDocs = getRelevance(Integer.parseInt(tuple[0]));
-        for (String line : lines) {
-            tuple = line.split(" ");
-            if(relevantDocs.contains(tuple[2])){
-                relevantCount += 1.0;
-                totalRecall = (relevantCount / relevantDocs.size());
-                listOfRecall.add(totalRecall);
-            }
-        }
-        return listOfRecall;
+        mean = totalPrecision / relevantDocs.size();
+        return mean;
     }
 
     public ArrayList<String> getRelevance (int queryNumber){

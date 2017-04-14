@@ -1,8 +1,14 @@
 package athena.retrievalmodel;
 
 import athena.index.InvertedIndexer;
+import athena.utils.CommonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Set;
 
@@ -10,6 +16,10 @@ public class BM25 implements RetrievalModel {
 
     @Autowired
     private InvertedIndexer invertedIndexer;
+    @Autowired
+    private CommonUtils commonUtils;
+    @Value("${search.engine.print.size}")
+    private Integer printSize;
 
     private static final Integer K2 = 100;
     private static final Double K1 = 1.2;
@@ -43,7 +53,7 @@ public class BM25 implements RetrievalModel {
                 termKeySet = terms.keySet();
                 Integer termDocumentCount = termKeySet.size();
                 for (String t : termKeySet) {
-                Integer termQueryCount = queryMap.get(s);
+                    Integer termQueryCount = queryMap.get(s);
                     Double value = Math.log((totalDocumentCount - termDocumentCount + 0.5) / (termDocumentCount + 0.5));
                     value = value * (((K1 + 1) * terms.get(t)) / (calculateK(tokenCountMap.get(t), averageTokenCount) +
                             terms.get(t)));
@@ -64,4 +74,14 @@ public class BM25 implements RetrievalModel {
         return K1 * ((1 - B) + B * (documentLength / averageLength));
     }
 
+
+    @Override
+    public void printN(HashMap<String, Double> hashMap, Integer queryID) {
+        String fs = File.separator;
+        String folderName = commonUtils.getOutputPath() + fs + getModelName() + fs;
+        commonUtils.verifyFolder(folderName);
+        String filePath = folderName + queryID + ".txt";
+
+        RetrievalModels.printN(hashMap, queryID, filePath, getModelName(), printSize);
+    }
 }
