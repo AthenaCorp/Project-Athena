@@ -68,13 +68,31 @@ public class EffectivenessEvaluation {
         for (String line : lines) {
             tuple = line.split(" ");
             count += 1.0;
-            if(relevantDocs.contains(tuple[2])){
+            if (relevantDocs.contains(tuple[2])) {
                 relevantCount += 1.0;
-                totalPrecision += (relevantCount / count);
+                totalPrecision = (relevantCount / count);
+                listOfPrecision.add(totalPrecision);
             }
         }
-        mean = totalPrecision / relevantDocs.size();
-        return mean;
+        return listOfPrecision;
+    }
+
+    public ArrayList<Double> listOfRecall(List<String> lines){
+        ArrayList<Double> listOfRecall = new ArrayList<>();
+        double relevantCount = 0.0;
+        double totalRecall;
+        String[] tuple;
+        tuple = lines.get(0).split(" ");
+        ArrayList<String> relevantDocs = getRelevance(Integer.parseInt(tuple[0]));
+        for (String line : lines) {
+            tuple = line.split(" ");
+            if(relevantDocs.contains(tuple[2])){
+                relevantCount += 1.0;
+                totalRecall = (relevantCount / relevantDocs.size());
+                listOfRecall.add(totalRecall);
+            }
+        }
+        return listOfRecall;
     }
 
     public ArrayList<String> getRelevance (int queryNumber){
