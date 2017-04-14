@@ -8,6 +8,7 @@ import java.util.Set;
 
 /**
  * Created by Pallav on 4/8/2017.
+ *
  */
 
 public class TfIdf implements RetrievalModel {
@@ -17,19 +18,18 @@ public class TfIdf implements RetrievalModel {
 
     private HashMap<String, Double> tfIdfMap = new HashMap<>();
     private HashMap<String, HashMap<String, Integer>> index;
+    private HashMap<String, Integer> tokenCountMap;
 
     private HashMap<String, Double> calculateTfIdf(String query) {
-        HashMap queryTerms = RetrievalModels.getQueryMap(query);
-        HashMap<String, Integer> tokenCountMap = invertedIndexer.readTokenCountToJsonFile();
+        HashMap<String, Integer> queryTerms = RetrievalModels.getQueryMap(query);
         Set<String> queries = queryTerms.keySet();
         Set<String> docs = tokenCountMap.keySet();
-
+        Integer totalDocumentSize = tokenCountMap.size();
         for (String s : docs) {                       //Document name
             double tfIdfScore = 0;
             for (String q : queries) {
-                String queryTerm = q;
-                double tf = calculateTf(queryTerm, s, tokenCountMap);
-                double idf = calculateIdf(queryTerm, tokenCountMap.size());
+                double tf = calculateTf(q, s);
+                double idf = calculateIdf(q, totalDocumentSize);
                 tfIdfScore += tf * idf;
             }
             tfIdfMap.put(s, tfIdfScore);
@@ -37,7 +37,7 @@ public class TfIdf implements RetrievalModel {
         return RetrievalModels.sortBM(tfIdfMap);
     }
 
-    public double calculateTf(String queryTerm, String docId, HashMap<String, Integer> tokenCountMap) {
+    private double calculateTf(String queryTerm, String docId) {
         // Number of times a term appears in a document
         HashMap<String, Integer> integerHashMap = index.get(queryTerm.toLowerCase());
         if (integerHashMap.containsKey(docId)) {
@@ -50,7 +50,7 @@ public class TfIdf implements RetrievalModel {
         }
     }
 
-    public double calculateIdf(String queryTerm, Integer totalDocumentCount) {
+    private double calculateIdf(String queryTerm, Integer totalDocumentCount) {
         // number of docs with term t in it
         double num = index.get(queryTerm).size();
         return Math.log(totalDocumentCount / num);
@@ -58,11 +58,12 @@ public class TfIdf implements RetrievalModel {
 
     @Override
     public HashMap<String, Double> getRanking(String query) {
-        setIndex();
+        setIndexAndTokenMap();
         return calculateTfIdf(query);
     }
 
-    public void setIndex() {
+    private void setIndexAndTokenMap() {
         index = invertedIndexer.readIndexFromJsonFile();
+        tokenCountMap = invertedIndexer.readTokenCountToJsonFile();
     }
 }
