@@ -5,12 +5,12 @@ import athena.evaluation.EffectivenessEvaluation;
 import athena.index.InvertedIndexer;
 import athena.queryexpansion.PseudoRelevanceFeedback;
 import athena.retrievalmodel.RetrievalModel;
-import athena.retrievalmodel.RetrievalModels;
 import athena.utils.CommonUtils;
+import athena.utils.SearchEngineUtils;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
 
-import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 public class SpringConfigurator {
@@ -28,11 +28,10 @@ public class SpringConfigurator {
         InvertedIndexer indexer = (InvertedIndexer) context.getBean("invertedIndexer");
         String resourceFolder = commonUtils.getResourcePath();
         String inputFolder;
-        if(Boolean.getBoolean(properties.getProperty("search.engine.enable.stemming"))){
+        if (Boolean.getBoolean(properties.getProperty("search.engine.enable.stemming"))) {
             inputFolder = resourceFolder + properties.getProperty("search" +
                     ".engine.steminput.folder") + "\\";
-        }
-        else {
+        } else {
             inputFolder = resourceFolder + properties.getProperty("search.engine.input.folder") + "\\";
         }
         String indexFolder = resourceFolder + properties.getProperty("search.engine.index.folder") + "\\";
@@ -44,7 +43,7 @@ public class SpringConfigurator {
 
     public void retrieveRanking(String query, Integer queryID) {
         RetrievalModel retrievalModel = (RetrievalModel) context.getBean("retrievalModel");
-        if(properties.getProperty("search.engine.enable.query.expansion").equals("false")) {
+        if (properties.getProperty("search.engine.enable.query.expansion").equals("false")) {
             retrievalModel.printN(retrievalModel.getRanking(query), queryID);
         } else {
             PseudoRelevanceFeedback feedback = (PseudoRelevanceFeedback) context.getBean("pseudoRelevanceFeedback");
@@ -61,12 +60,10 @@ public class SpringConfigurator {
         String indexFolder = resourceFolder + properties.getProperty("search.engine.index.folder") + "\\";
         indexer.setIndexFolder(indexFolder);
         setRetrievalModel();
-        HashMap<Integer, String> queries = new HashMap<>();
-        queries.put(1, "Algorithms for parallel computation, and especially comparisons between parallel and sequential algorithms.");
-        queries.put(2, "I am interested in articles written either by Prieve or Udo Pooch");
-        queries.put(3, "List all articles on EL1 and ECL (EL1 may be given as EL/1; I don't remember how they did it.");
-        for (Integer q : queries.keySet()) {
-            retrieveRanking(queries.get(q), q);
+        Map<Integer, String> queries = SearchEngineUtils.getQuerySet(commonUtils.getResourcePath()
+                + "query\\cacm.query.txt");
+        for (int i = 1; i <= queries.size(); i++) {
+            retrieveRanking(queries.get(i), i);
         }
         long stopTime = commonUtils.printTimeStamp("Ranking Completed");
         commonUtils.printTotalTime(startTime, stopTime);
@@ -115,12 +112,12 @@ public class SpringConfigurator {
         context.refresh();
     }
 
-    public void execStemFile(String filename){
+    public void execStemFile(String filename) {
         TextFileParser t = (TextFileParser) context.getBean("textFileParser");
         t.splitTextFile(filename);
     }
 
-    public void execEval(){
+    public void execEval() {
         EffectivenessEvaluation e = (EffectivenessEvaluation) context.getBean
                 ("effectivenessEvaluation");
 

@@ -1,9 +1,6 @@
 package athena.execute;
 
-import athena.TextFileParser;
-import athena.evaluation.EffectivenessEvaluation;
 import athena.retrievalmodel.BM25;
-import athena.retrievalmodel.RetrievalModels;
 import athena.retrievalmodel.TfIdf;
 import athena.utils.CommonUtils;
 
