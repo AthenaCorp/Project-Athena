@@ -169,9 +169,21 @@ public class EffectivenessEvaluation {
 
     public void pAtK(ArrayList<Double> precValues, String qId) {
 
-        double pAtK5 = precValues.get(5);
-//        double pAtK20 = precValues.get(20);
-        String line = qId + " " + pAtK5;
+        double pAtK5, pAtK20;
+        if(precValues.size()>=5) {
+            pAtK5 = precValues.get(4);
+        }
+        else {
+            pAtK5 = 0;
+        }
+        if (precValues.size()>=20) {
+            pAtK20 = precValues.get(19);
+        }
+        else {
+            pAtK20 = 0;
+        }
+
+        String line = qId + " " + pAtK5 + " " + pAtK20 + "\n";
         File file = new File(commonUtils.getOutputPath()+ "\\" + "pAtK.txt");
         FileWriter fileWriter;
         try {
