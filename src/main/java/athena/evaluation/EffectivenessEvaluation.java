@@ -26,9 +26,10 @@ public class EffectivenessEvaluation {
     @Autowired
     private InvertedIndexer invertedIndexer;
 
-    public double meanAveragePrecision(String folderPath) {
+    public void evaluation(String folderPath) {
         double count = 0.0;
         double totalPrecision = 0.0;
+        double totalReciprocal = 0.0;
         double mean;
         String fs = File.separator;
         folderPath = commonUtils.getOutputPath() + fs + folderPath;
@@ -40,17 +41,40 @@ public class EffectivenessEvaluation {
             for (File file : files) {
                 List<String> lines = getTextFromFile(folderPath + fs + file.getName());
                 totalPrecision += averagePrecision(lines);
+                totalReciprocal += reciprocalRank(lines);
+                precisionRecallValues(lines);
                 count++;
             }
         }
         mean = totalPrecision / count;
-        return mean;
+        System.out.println("Mean average precision: " + mean);
+        mean = totalReciprocal / count;
+        System.out.println("Mean Reciprocal Rank: " + mean);
+
+    }
+
+    public double reciprocalRank(List<String> lines){
+        double count = 0.0;
+        String[] tuple;
+        tuple = lines.get(0).split(" ");
+        ArrayList<String> relevantDocs = getRelevance(Integer.parseInt(tuple[0]));
+        for (String line : lines) {
+            tuple = line.split(" ");
+            count += 1.0;
+            if (relevantDocs.contains(tuple[2])) {
+                return 1.0/count;
+            }
+        }
+        return 0.0;
     }
 
     public double averagePrecision(List<String> lines){
         double totalPrecision = 0.0;
         double mean;
         ArrayList<Double> lop = listOfPrecision(lines);
+        if(lop.isEmpty()){
+            return 0.0;
+        }
         for (Double d : lop) {
             totalPrecision += d;
         }
@@ -71,9 +95,9 @@ public class EffectivenessEvaluation {
             count += 1.0;
             if (relevantDocs.contains(tuple[2])) {
                 relevantCount += 1.0;
-                totalPrecision = (relevantCount / count);
-                listOfPrecision.add(totalPrecision);
             }
+            totalPrecision = (relevantCount / count);
+            listOfPrecision.add(totalPrecision);
         }
         return listOfPrecision;
     }
@@ -89,11 +113,35 @@ public class EffectivenessEvaluation {
             tuple = line.split(" ");
             if(relevantDocs.contains(tuple[2])){
                 relevantCount += 1.0;
-                totalRecall = (relevantCount / relevantDocs.size());
-                listOfRecall.add(totalRecall);
             }
+            totalRecall = (relevantCount / relevantDocs.size());
+            listOfRecall.add(totalRecall);
         }
         return listOfRecall;
+    }
+
+    public void precisionRecallValues(List<String> lines){
+        ArrayList<Double> lop = listOfPrecision(lines);
+        ArrayList<Double> lor = listOfRecall(lines);
+        System.out.println(lop);
+        System.out.println(lor);
+        String print = "";
+        for (int i = 0; i < lop.size(); i++){
+            print = print.concat(lop.get(i)+" "+lor.get(i)+"\n");
+        }
+
+        String[] tuple;
+        tuple = lines.get(0).split(" ");
+        File file = new File(commonUtils.getOutputPath()+ "\\" +
+                tuple[0]+"_prvalues.txt");
+        FileWriter fileWriter;
+        try {
+            fileWriter = new FileWriter(file);
+            fileWriter.write(print);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     public void calculatePAtK(String folderPath) {
