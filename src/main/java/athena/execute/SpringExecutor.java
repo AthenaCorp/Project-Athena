@@ -5,7 +5,7 @@ public class SpringExecutor {
         SpringConfigurator configurator = new SpringConfigurator();
         //configurator.execStemFile("cacm_stem.txt");
         //configurator.generateIndex();
-        //configurator.executeQuerySearching();
+        configurator.executeQuerySearching();
         configurator.execEval();
     }
 }

@@ -125,5 +125,6 @@ public class SpringConfigurator {
                 ("effectivenessEvaluation");
         //e.meanAveragePrecision("Task2_1.txt");
         System.out.println(e.meanAveragePrecision("BM25"));
+        e.calculatePAtK("BM25");
     }
 }

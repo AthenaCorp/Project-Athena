@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -95,7 +96,53 @@ public class EffectivenessEvaluation {
         return listOfRecall;
     }
 
-    public ArrayList<String> getRelevance (int queryNumber){
+    public void calculatePAtK(String folderPath) {
+
+        String fs = File.separator;
+        folderPath = commonUtils.getOutputPath() + fs + folderPath;
+        File folder = new File(folderPath);
+        File[] files = folder.listFiles();
+        if (files == null) {
+            System.out.println("No files present or invalid folder");
+        } else {
+            for (File file : files) {
+                List<String> lines = getTextFromFile(folderPath + fs + file.getName());
+                String[] tuple;
+                tuple = lines.get(0).split(" ");
+                String queryId = tuple[0];
+                ArrayList<Double> lstOfPrecision = listOfPrecision(lines);
+                pAtK(lstOfPrecision, queryId);
+
+            }
+        }
+
+    }
+
+
+    public void pAtK(ArrayList<Double> precValues, String qId) {
+
+        double pAtK5 = precValues.get(5);
+//        double pAtK20 = precValues.get(20);
+        String line = qId + " " + pAtK5;
+        File file = new File(commonUtils.getOutputPath()+ "\\" + "pAtK.txt");
+        FileWriter fileWriter;
+        try {
+            fileWriter = new FileWriter(file);
+            fileWriter.write(line);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+//
+//    public void writeToFilePAtK(ArrayList<Double> precisionValues, String query) {
+//        double pAtK5 = precisionValues.get(5);
+//        double pAtK20 = precisionValues.get(20);
+//        String line = query + pAtK5 + pAtK20;
+//
+//    }
+
+    public ArrayList<String> getRelevance(int queryNumber) {
         String[] tuple;
         String filename = commonUtils.getResourcePath() + "//query//cacm.rel";
         List<String> lines = getTextFromFile(filename);

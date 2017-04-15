@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.io.*;
+import java.lang.management.BufferPoolMXBean;
 import java.util.*;
 
 public class InvertedIndexer {
@@ -21,6 +22,8 @@ public class InvertedIndexer {
     private Boolean doCaseFold;
     @Value("${search.engine.remove.noise.factor}")
     private Integer noiseFactor;
+    @Value("${search.engine.enable.stopping}")
+    private Boolean doStopping;
 
     private String indexFolder;
     private String dataFolder;
@@ -74,6 +77,9 @@ public class InvertedIndexer {
                     if (doCaseFold) {
                         content = caseFoldText(content);
                     }
+                    if (doStopping) {
+                        content = stoppedText(content);
+                    }
                     for (int i = 0; i < noiseFactor; i++) {
                         content = removeNoise(content);
                     }
@@ -108,6 +114,28 @@ public class InvertedIndexer {
 
     private String caseFoldText(String text) {
         return text.toLowerCase();
+    }
+
+    private String stoppedText(String text) {
+        File file = new File(commonUtils.getResourcePath() + "\\query\\common_words.txt");
+        ArrayList<String> stopList = new ArrayList<>();
+        try {
+            FileReader fileReader = new FileReader(file);
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            String word = bufferedReader.readLine();
+            while (word != null) {
+                stopList.add(word);
+                word = bufferedReader.readLine();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        for (String stopWord : stopList) {
+            text = text.replaceAll("(?i)"+stopWord, " ");
+        }
+
+        return text;
     }
 
     //TODO: Time is not getting preserved. Do we have to?
