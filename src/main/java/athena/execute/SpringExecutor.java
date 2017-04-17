@@ -7,5 +7,6 @@ public class SpringExecutor {
         //configurator.generateIndex();
         configurator.executeQuerySearching();
         configurator.execEval();
+
     }
 }
