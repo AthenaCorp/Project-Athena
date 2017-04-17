@@ -19,6 +19,9 @@ public class TfIdf implements RetrievalModel {
     private InvertedIndexer invertedIndexer;
     @Autowired
     private CommonUtils commonUtils;
+
+    @Value("${search.engine.ngrams}")
+    private Integer nGrams;
     @Value("${search.engine.print.size}")
     private Integer printSize;
 
@@ -27,7 +30,7 @@ public class TfIdf implements RetrievalModel {
     private HashMap<String, Integer> tokenCountMap;
 
     private HashMap<String, Double> calculateTfIdf(String query) {
-        HashMap<String, Integer> queryTerms = RetrievalModels.getQueryMap(query);
+        HashMap<String, Integer> queryTerms = RetrievalModels.getQueryMap(query, nGrams);
         Set<String> queries = queryTerms.keySet();
         Set<String> docs = tokenCountMap.keySet();
         Integer totalDocumentSize = tokenCountMap.size();

@@ -18,6 +18,9 @@ public class BM25 implements RetrievalModel {
     private InvertedIndexer invertedIndexer;
     @Autowired
     private CommonUtils commonUtils;
+
+    @Value("${search.engine.ngrams}")
+    private Integer nGrams;
     @Value("${search.engine.print.size}")
     private Integer printSize;
 
@@ -44,7 +47,7 @@ public class BM25 implements RetrievalModel {
 
         HashMap<String, Integer> terms;
         Set<String> termKeySet;
-        HashMap<String, Integer> queryMap = RetrievalModels.getQueryMap(query);
+        HashMap<String, Integer> queryMap = RetrievalModels.getQueryMap(query, nGrams);
         Set<String> queryWords = queryMap.keySet();
 
         for (String s : queryWords) {

@@ -13,14 +13,20 @@ public class RetrievalModels {
     private static final String SPLIT_CHARACTER = " ";
 
     // Split the whole query into separate words and counts
-    public static HashMap<String, Integer> getQueryMap(String query) {
+    public static HashMap<String, Integer> getQueryMap(String query, Integer nGrams) {
         HashMap<String, Integer> hashMap = new HashMap<>();
-        String[] strings = query.split(SPLIT_CHARACTER);
-        for (String s : strings) {
-            if (hashMap.containsKey(s)) {
-                hashMap.put(s, hashMap.get(s) + 1);
+        String[] words = query.split(SPLIT_CHARACTER);
+        int tokenCount = words.length - nGrams;
+        String word;
+        for (int i = 0; i <= tokenCount; i++) {
+            word = words[i];
+            for (int j = 1; j < nGrams; j++) {
+                word = word + " " + words[i + j];
+            }
+            if (hashMap.containsKey(word)) {
+                hashMap.put(word, hashMap.get(word) + 1);
             } else {
-                hashMap.put(s, 1);
+                hashMap.put(word, 1);
             }
         }
         return hashMap;
