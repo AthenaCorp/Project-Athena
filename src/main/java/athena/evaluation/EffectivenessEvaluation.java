@@ -57,6 +57,10 @@ public class EffectivenessEvaluation {
         System.out.println("Mean average precision: " + mean);
         mean = totalReciprocal / count;
         System.out.println("Mean Reciprocal Rank: " + mean);
+        System.out.println("P @ K values for 5, 20 printed in pAtK.txt");
+        //calculatePAtK(folderPath);
+        System.out.println("Query-by-query precision/recall values printed " +
+                "in [qid]_prvalues.txt");
 
     }
 
@@ -77,15 +81,21 @@ public class EffectivenessEvaluation {
 
     public double averagePrecision(List<String> lines){
         double totalPrecision = 0.0;
-        double mean;
+        double mean = 0.0;
+        double count = 0.0;
         ArrayList<Double> lop = listOfPrecision(lines);
         if(lop.isEmpty()){
             return 0.0;
         }
         for (Double d : lop) {
-            totalPrecision += d;
+            if(d != 0.0){
+                totalPrecision += d;
+                count += 1.0;
+            }
         }
-        mean = totalPrecision / lop.size();
+        if(count != 0.0){
+            mean = totalPrecision / count;
+        }
         return mean;
     }
 
@@ -102,9 +112,14 @@ public class EffectivenessEvaluation {
             count += 1.0;
             if (relevantDocs.contains(tuple[2])) {
                 relevantCount += 1.0;
+                totalPrecision = (relevantCount / count);
+                listOfPrecision.add(totalPrecision);
             }
-            totalPrecision = (relevantCount / count);
-            listOfPrecision.add(totalPrecision);
+            else {
+                listOfPrecision.add(0.0);
+
+            }
+
         }
         return listOfPrecision;
     }
