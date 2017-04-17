@@ -19,6 +19,8 @@ public class BM25 implements RetrievalModel {
     @Autowired
     private CommonUtils commonUtils;
 
+    @Value("${search.engine.name}")
+    private String searchEngineName;
     @Value("${search.engine.ngrams}")
     private Integer nGrams;
     @Value("${search.engine.print.size}")
@@ -81,7 +83,9 @@ public class BM25 implements RetrievalModel {
     @Override
     public void printN(HashMap<String, Double> hashMap, Integer queryID) {
         String fs = File.separator;
-        String folderName = commonUtils.getOutputPath() + fs + getModelName() + fs;
+        String folderName = commonUtils.getOutputPath() + fs +
+                searchEngineName +
+                fs;
         commonUtils.verifyFolder(folderName);
         if(queryID < 10) {
             folderName =  folderName + "0";

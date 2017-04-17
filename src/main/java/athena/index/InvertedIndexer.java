@@ -89,7 +89,7 @@ public class InvertedIndexer {
             e.printStackTrace();
         }
     }
-
+// TODO: fix remove numbers
     private String removeNumbers(String content) {
         String newContent = "";
         try {

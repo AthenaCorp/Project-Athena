@@ -120,9 +120,6 @@ public class SpringConfigurator {
     public void execEval() {
         EffectivenessEvaluation e = (EffectivenessEvaluation) context.getBean
                 ("effectivenessEvaluation");
-
-        e.calculatePAtK("BM25");
-
-        e.evaluation("BM25");
+        e.evaluation(properties.getProperty("search.engine.name"));
     }
 }

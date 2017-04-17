@@ -33,6 +33,7 @@ public class EffectivenessEvaluation {
         double mean;
         String fs = File.separator;
         folderPath = commonUtils.getOutputPath() + fs + folderPath;
+        calculatePAtK(folderPath);
         File folder = new File(folderPath);
         File[] files = folder.listFiles();
         if (files == null) {
@@ -40,10 +41,11 @@ public class EffectivenessEvaluation {
         } else {
             for (File file : files) {
                 List<String> lines = getTextFromFile(folderPath + fs + file.getName());
-                if(lines.size() != 0){
+                if((lines.size() != 0) && (!file.getName().equals("pAtK.txt"))){
+                    System.out.println(lines.size());
                     totalPrecision += averagePrecision(lines);
                     totalReciprocal += reciprocalRank(lines);
-                    precisionRecallValues(lines);
+                    precisionRecallValues(lines, folderPath);
                 }
                 else {
                     totalPrecision += 0;
@@ -61,6 +63,7 @@ public class EffectivenessEvaluation {
         //calculatePAtK(folderPath);
         System.out.println("Query-by-query precision/recall values printed " +
                 "in [qid]_prvalues.txt");
+
 
     }
 
@@ -80,22 +83,26 @@ public class EffectivenessEvaluation {
     }
 
     public double averagePrecision(List<String> lines){
-        double totalPrecision = 0.0;
         double mean = 0.0;
         double count = 0.0;
-        ArrayList<Double> lop = listOfPrecision(lines);
-        if(lop.isEmpty()){
-            return 0.0;
-        }
-        for (Double d : lop) {
-            if(d != 0.0){
-                totalPrecision += d;
-                count += 1.0;
+        double relevantCount = 0.0;
+        double totalPrecision = 0.0;
+        String[] tuple;
+        tuple = lines.get(0).split(" ");
+        ArrayList<String> relevantDocs = getRelevance(Integer.parseInt(tuple[0]));
+        for (String line : lines) {
+            tuple = line.split(" ");
+            count += 1.0;
+            if (relevantDocs.contains(tuple[2])) {
+                relevantCount += 1.0;
+                totalPrecision += (relevantCount / count);
             }
+
         }
-        if(count != 0.0){
-            mean = totalPrecision / count;
+        if(relevantCount != 0.0){
+            mean = totalPrecision / relevantCount;
         }
+
         return mean;
     }
 
@@ -112,14 +119,9 @@ public class EffectivenessEvaluation {
             count += 1.0;
             if (relevantDocs.contains(tuple[2])) {
                 relevantCount += 1.0;
-                totalPrecision = (relevantCount / count);
-                listOfPrecision.add(totalPrecision);
             }
-            else {
-                listOfPrecision.add(0.0);
-
-            }
-
+            totalPrecision = (relevantCount / count);
+            listOfPrecision.add(totalPrecision);
         }
         return listOfPrecision;
     }
@@ -142,7 +144,7 @@ public class EffectivenessEvaluation {
         return listOfRecall;
     }
 
-    public void precisionRecallValues(List<String> lines){
+    public void precisionRecallValues(List<String> lines, String folderPath){
         ArrayList<Double> lop = listOfPrecision(lines);
         ArrayList<Double> lor = listOfRecall(lines);
         String print = "";
@@ -152,7 +154,8 @@ public class EffectivenessEvaluation {
 
         String[] tuple;
         tuple = lines.get(0).split(" ");
-        File file = new File(commonUtils.getOutputPath()+ "\\" +
+
+        File file = new File(folderPath+ "\\" +
                 tuple[0]+"_prvalues.txt");
         FileWriter fileWriter;
         try {
@@ -168,7 +171,7 @@ public class EffectivenessEvaluation {
     public void calculatePAtK(String folderPath) {
 
         String fs = File.separator;
-        folderPath = commonUtils.getOutputPath() + fs + folderPath;
+
         File folder = new File(folderPath);
         File[] files = folder.listFiles();
         String line = "";
@@ -188,7 +191,7 @@ public class EffectivenessEvaluation {
                 }
 
             }
-            File file = new File(commonUtils.getOutputPath()+ "\\" + "pAtK.txt");
+            File file = new File(folderPath+ "\\" + "pAtK.txt");
             FileWriter fileWriter;
             try {
                 fileWriter = new FileWriter(file);
