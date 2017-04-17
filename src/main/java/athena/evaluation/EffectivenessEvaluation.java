@@ -40,9 +40,16 @@ public class EffectivenessEvaluation {
         } else {
             for (File file : files) {
                 List<String> lines = getTextFromFile(folderPath + fs + file.getName());
-                totalPrecision += averagePrecision(lines);
-                totalReciprocal += reciprocalRank(lines);
-                precisionRecallValues(lines);
+                if(lines.size() != 0){
+                    totalPrecision += averagePrecision(lines);
+                    totalReciprocal += reciprocalRank(lines);
+                    precisionRecallValues(lines);
+                }
+                else {
+                    totalPrecision += 0;
+                    totalReciprocal += 0;
+                }
+
                 count++;
             }
         }
@@ -123,8 +130,6 @@ public class EffectivenessEvaluation {
     public void precisionRecallValues(List<String> lines){
         ArrayList<Double> lop = listOfPrecision(lines);
         ArrayList<Double> lor = listOfRecall(lines);
-        System.out.println(lop);
-        System.out.println(lor);
         String print = "";
         for (int i = 0; i < lop.size(); i++){
             print = print.concat(lop.get(i)+" "+lor.get(i)+"\n");
@@ -138,6 +143,7 @@ public class EffectivenessEvaluation {
         try {
             fileWriter = new FileWriter(file);
             fileWriter.write(print);
+            fileWriter.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -150,24 +156,38 @@ public class EffectivenessEvaluation {
         folderPath = commonUtils.getOutputPath() + fs + folderPath;
         File folder = new File(folderPath);
         File[] files = folder.listFiles();
+        String line = "";
         if (files == null) {
             System.out.println("No files present or invalid folder");
         } else {
             for (File file : files) {
-                List<String> lines = getTextFromFile(folderPath + fs + file.getName());
-                String[] tuple;
-                tuple = lines.get(0).split(" ");
-                String queryId = tuple[0];
-                ArrayList<Double> lstOfPrecision = listOfPrecision(lines);
-                pAtK(lstOfPrecision, queryId);
 
+                List<String> lines = getTextFromFile(folderPath + fs + file.getName());
+                //System.out.println(lines);
+                if(lines.size() != 0){
+                    String[] tuple;
+                    tuple = lines.get(0).split(" ");
+                    String queryId = tuple[0];
+                    ArrayList<Double> lstOfPrecision = listOfPrecision(lines);
+                    line  = line.concat(pAtK(lstOfPrecision, queryId)) ;
+                }
+
+            }
+            File file = new File(commonUtils.getOutputPath()+ "\\" + "pAtK.txt");
+            FileWriter fileWriter;
+            try {
+                fileWriter = new FileWriter(file);
+                fileWriter.write(line);
+                fileWriter.close();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
 
     }
 
 
-    public void pAtK(ArrayList<Double> precValues, String qId) {
+    public String pAtK(ArrayList<Double> precValues, String qId) {
 
         double pAtK5, pAtK20;
         if(precValues.size()>=5) {
@@ -184,14 +204,8 @@ public class EffectivenessEvaluation {
         }
 
         String line = qId + " " + pAtK5 + " " + pAtK20 + "\n";
-        File file = new File(commonUtils.getOutputPath()+ "\\" + "pAtK.txt");
-        FileWriter fileWriter;
-        try {
-            fileWriter = new FileWriter(file);
-            fileWriter.write(line);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        return line;
+
 
     }
 //

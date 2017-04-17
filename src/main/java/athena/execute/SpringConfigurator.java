@@ -121,7 +121,7 @@ public class SpringConfigurator {
         EffectivenessEvaluation e = (EffectivenessEvaluation) context.getBean
                 ("effectivenessEvaluation");
 
-//        e.evaluation("BM25");
+        e.evaluation("BM25");
         e.calculatePAtK("BM25");
     }
 }
