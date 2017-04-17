@@ -11,7 +11,6 @@ import java.util.Set;
 
 /**
  * Created by Pallav on 4/8/2017.
- *
  */
 
 public class TfIdf implements RetrievalModel {
@@ -86,8 +85,11 @@ public class TfIdf implements RetrievalModel {
         String fs = File.separator;
         String folderName = commonUtils.getOutputPath() + fs + getModelName() + fs;
         commonUtils.verifyFolder(folderName);
-        String filePath = folderName + queryID + ".txt";
 
+        if (queryID < 10) {
+            folderName = folderName + "0";
+        }
+        String filePath = folderName + queryID + ".txt";
 
         RetrievalModels.printN(hashMap, queryID, filePath, getModelName(), printSize);
     }

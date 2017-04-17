@@ -80,6 +80,9 @@ public class BM25 implements RetrievalModel {
         String fs = File.separator;
         String folderName = commonUtils.getOutputPath() + fs + getModelName() + fs;
         commonUtils.verifyFolder(folderName);
+        if(queryID < 10) {
+            folderName =  folderName + "0";
+        }
         String filePath = folderName + queryID + ".txt";
 
         RetrievalModels.printN(hashMap, queryID, filePath, getModelName(), printSize);
