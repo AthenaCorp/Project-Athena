@@ -51,11 +51,17 @@ public class TfIdf implements RetrievalModel {
     private double calculateTf(String queryTerm, String docId) {
         // Number of times a term appears in a document
         HashMap<String, Integer> integerHashMap = index.get(queryTerm.toLowerCase());
+        if (integerHashMap == null) {
+            return 0;
+        }
         if (integerHashMap.containsKey(docId)) {
             double num = index.get(queryTerm.toLowerCase()).get(docId);
             // Total number of terms in a document
             double totalTerms = tokenCountMap.get(docId);
-            return num / totalTerms;
+            if (totalTerms == 0) {
+                return 0;
+            }
+            else return num / totalTerms;
         } else {
             return 0;
         }
@@ -63,8 +69,14 @@ public class TfIdf implements RetrievalModel {
 
     private double calculateIdf(String queryTerm, Integer totalDocumentCount) {
         // number of docs with term t in it
-        double num = index.get(queryTerm).size();
-        return Math.log(totalDocumentCount / num);
+        if(index.containsKey(queryTerm)) {
+            double num = index.get(queryTerm).size();
+            if(num == 0) {
+                return 0;
+            }
+            else return Math.log(totalDocumentCount / num);
+        }
+        else return 0;
     }
 
     @Override
