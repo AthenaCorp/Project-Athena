@@ -118,36 +118,32 @@ public class CommonUtils {
 
     public void verifyFolder(String folder) {
         File file = new File(folder);
-        if(!file.exists()) {
-            if(file.mkdir()) {
-                System.out.println("Folder created : " +  folder);
-            } else {
-                System.err.println("Error creating folder : " +  folder);
+        if (!file.exists()) {
+            if (!file.mkdir()) {
+                System.err.println("Error creating folder : " + folder);
             }
-
         }
     }
 
-    public List<String> getLinesFromFile(String filename){
+    public List<String> getLinesFromFile(String filename) {
         List<String> lines = null;
         try {
-            lines = Files.readAllLines (Paths.get (filename),
-                    Charset.forName ("UTF-8"));
-        }
-        catch (IOException e) {
-            System.out.print ("IO Exception reading from file: ");
-            System.out.println (filename);
-            System.out.println (e);
+            lines = Files.readAllLines(Paths.get(filename),
+                    Charset.forName("UTF-8"));
+        } catch (IOException e) {
+            System.out.print("IO Exception reading from file: ");
+            System.out.println(filename);
+            System.out.println(e);
         }
         return lines;
     }
 
-    public String getTextFromFile(String filename){
+    public String getTextFromFile(String filename) {
         String content = "";
         try {
             BufferedReader br = new BufferedReader(new FileReader(new File(filename)));
-            String c =  br.readLine();
-            while(c != null) {
+            String c = br.readLine();
+            while (c != null) {
                 content += c;
                 c = br.readLine();
             }
@@ -156,5 +152,27 @@ public class CommonUtils {
             e.printStackTrace();
         }
         return content;
+    }
+
+    public void clearFolder(String folderPath) {
+        File file = new File(folderPath);
+        if (file.exists()) {
+            deleteFolder(file);
+        }
+        verifyFolder(folderPath);
+    }
+
+    public void deleteFolder(File folder) {
+        File[] files = folder.listFiles();
+        if (files != null) { //some JVMs return null for empty dirs
+            for (File f : files) {
+                if (f.isDirectory()) {
+                    deleteFolder(f);
+                } else {
+                    f.delete();
+                }
+            }
+        }
+        folder.delete();
     }
 }

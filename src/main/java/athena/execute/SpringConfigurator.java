@@ -125,6 +125,6 @@ public class SpringConfigurator {
 
     public void executeLucene() {
         LuceneExecutor luceneExecutor = new LuceneExecutor();
-        luceneExecutor.executor();
+        luceneExecutor.executor(false);
     }
 }

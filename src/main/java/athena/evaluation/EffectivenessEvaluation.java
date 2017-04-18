@@ -1,30 +1,20 @@
 package athena.evaluation;
 
-import athena.crawler.CrawlerUtils;
-import athena.index.InvertedIndexer;
 import athena.utils.CommonUtils;
-import org.jsoup.Jsoup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 
 public class EffectivenessEvaluation {
-
-    @Autowired
-    private CrawlerUtils crawlerUtils;
     @Autowired
     private CommonUtils commonUtils;
-    @Autowired
-    private InvertedIndexer invertedIndexer;
 
     public void evaluation(String folderPath) {
         double count = 0.0;
@@ -40,7 +30,7 @@ public class EffectivenessEvaluation {
             System.out.println("No files present or invalid folder");
         } else {
             for (File file : files) {
-                List<String> lines = getTextFromFile(folderPath + fs + file.getName());
+                List<String> lines = commonUtils.getLinesFromFile(folderPath + fs + file.getName());
                 if((lines.size() != 0) && (!file.getName().equals("pAtK.txt"))){
                     System.out.println(lines.size());
                     totalPrecision += averagePrecision(lines);
@@ -67,7 +57,7 @@ public class EffectivenessEvaluation {
 
     }
 
-    public double reciprocalRank(List<String> lines){
+    private double reciprocalRank(List<String> lines){
         double count = 0.0;
         String[] tuple;
         tuple = lines.get(0).split(" ");
@@ -82,7 +72,7 @@ public class EffectivenessEvaluation {
         return 0.0;
     }
 
-    public double averagePrecision(List<String> lines){
+    private double averagePrecision(List<String> lines){
         double mean = 0.0;
         double count = 0.0;
         double relevantCount = 0.0;
@@ -106,7 +96,7 @@ public class EffectivenessEvaluation {
         return mean;
     }
 
-    public ArrayList<Double> listOfPrecision(List<String> lines){
+    private ArrayList<Double> listOfPrecision(List<String> lines){
         ArrayList<Double> listOfPrecision = new ArrayList<>();
         double count = 0.0;
         double relevantCount = 0.0;
@@ -126,7 +116,7 @@ public class EffectivenessEvaluation {
         return listOfPrecision;
     }
 
-    public ArrayList<Double> listOfRecall(List<String> lines){
+    private ArrayList<Double> listOfRecall(List<String> lines){
         ArrayList<Double> listOfRecall = new ArrayList<>();
         double relevantCount = 0.0;
         double totalRecall;
@@ -144,7 +134,7 @@ public class EffectivenessEvaluation {
         return listOfRecall;
     }
 
-    public void precisionRecallValues(List<String> lines, String folderPath){
+    private void precisionRecallValues(List<String> lines, String folderPath){
         ArrayList<Double> lop = listOfPrecision(lines);
         ArrayList<Double> lor = listOfRecall(lines);
         String print = "";
@@ -168,7 +158,7 @@ public class EffectivenessEvaluation {
 
     }
 
-    public void calculatePAtK(String folderPath) {
+    private void calculatePAtK(String folderPath) {
 
         String fs = File.separator;
 
@@ -179,8 +169,7 @@ public class EffectivenessEvaluation {
             System.out.println("No files present or invalid folder");
         } else {
             for (File file : files) {
-
-                List<String> lines = getTextFromFile(folderPath + fs + file.getName());
+                List<String> lines = commonUtils.getLinesFromFile(folderPath + fs + file.getName());
                 //System.out.println(lines);
                 if(lines.size() != 0){
                     String[] tuple;
@@ -204,8 +193,7 @@ public class EffectivenessEvaluation {
 
     }
 
-
-    public String pAtK(ArrayList<Double> precValues, String qId) {
+    private String pAtK(ArrayList<Double> precValues, String qId) {
 
         double pAtK5, pAtK20;
         if(precValues.size()>=5) {
@@ -234,10 +222,10 @@ public class EffectivenessEvaluation {
 //
 //    }
 
-    public ArrayList<String> getRelevance(int queryNumber) {
+    private ArrayList<String> getRelevance(int queryNumber) {
         String[] tuple;
         String filename = commonUtils.getResourcePath() + "//query//cacm.rel";
-        List<String> lines = getTextFromFile(filename);
+        List<String> lines = commonUtils.getLinesFromFile(filename);
         ArrayList<String > relevantDocs = new ArrayList<>();
         for (String line : lines) {
             tuple = line.split(" ");
@@ -246,19 +234,5 @@ public class EffectivenessEvaluation {
             }
         }
         return relevantDocs;
-    }
-
-    public List<String> getTextFromFile(String filename){
-        List<String> lines = null;
-        try {
-            lines = Files.readAllLines (Paths.get (filename),
-                    Charset.forName ("UTF-8"));
-        }
-        catch (IOException e) {
-            System.out.print ("IO Exception reading from file: ");
-            System.out.println (filename);
-            System.out.println (e);
-        }
-        return lines;
     }
 }

@@ -36,18 +36,20 @@ public class LuceneExecutor {
     private IndexWriter writer;
     private ArrayList<File> queue = new ArrayList<>();
 
-    public void executor() {
+    public void executor(Boolean isCreateIndex) {
         IndexSearcher searcher;
         TopScoreDocCollector collector;
         try {
             String indexLocation = commonUtils.getOutputPath() + "\\LuceneIndex";
-            /*String folderPath = commonUtils.getResourcePath() + "\\cacm";
-            FSDirectory dir = FSDirectory.open(new File(indexLocation));
-            IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_47, Sanalyzer);
-            writer = new IndexWriter(dir, config);
-            indexFileOrDirectory(folderPath);
-            writer.close();*/
-
+            if(isCreateIndex) {
+                commonUtils.clearFolder(indexLocation);
+                String folderPath = commonUtils.getResourcePath() + "\\cacm";
+                FSDirectory dir = FSDirectory.open(new File(indexLocation));
+                IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_47, Sanalyzer);
+                writer = new IndexWriter(dir, config);
+                indexFileOrDirectory(folderPath);
+                writer.close();
+            }
 
             IndexReader reader = DirectoryReader.open(FSDirectory.open(new File(indexLocation)));
             searcher = new IndexSearcher(reader);
@@ -69,7 +71,6 @@ public class LuceneExecutor {
                     int docId = hits[i].doc;
                     Document d = searcher.doc(docId);
                     fileWriter.write(1 + " Q0 " + d.get("filename") + " " + (i + 1) + " " + hits[i].score + " Lucene\n");
-                    //System.out.println((i + 1) + ". " + d.get("filename") + " score=" + hits[i].score);
                 }
                 // 5. term stats --> watch out for which "version" of the term
                 // must be checked here instead!
