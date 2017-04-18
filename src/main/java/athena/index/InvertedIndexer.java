@@ -2,6 +2,7 @@ package athena.index;
 
 import athena.crawler.CrawlerUtils;
 import athena.utils.CommonUtils;
+import athena.utils.SearchEngineUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -73,15 +74,7 @@ public class InvertedIndexer {
                 for (File file : files) {
                     content = Jsoup.parse(file, FILE_ENCODING).text();
                     content = removeNumbers(content);
-                    if (doCaseFold) {
-                        content = caseFoldText(content);
-                    }
-                    if (doStopping) {
-                        content = stoppedText(content);
-                    }
-                    for (int i = 0; i < noiseFactor; i++) {
-                        content = removeNoise(content);
-                    }
+                    SearchEngineUtils.cleanDocumentContent(content, doCaseFold, doStopping, noiseFactor);
                     createTokenizedFile(formatFileName(file.getName()), content);
                 }
             }
@@ -109,47 +102,6 @@ public class InvertedIndexer {
 
     private String formatFileName(String fileName) {
         return StringUtils.remove(fileName, ".html");
-    }
-
-    private String caseFoldText(String text) {
-        return text.toLowerCase();
-    }
-
-    private String stoppedText(String text) {
-        File file = new File(commonUtils.getResourcePath() + "\\query\\common_words.txt");
-        ArrayList<String> stopList = new ArrayList<>();
-        try {
-            FileReader fileReader = new FileReader(file);
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
-            String word = bufferedReader.readLine();
-            while (word != null) {
-                stopList.add(word);
-                word = bufferedReader.readLine();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        for (String stopWord : stopList) {
-            text = text.replaceAll("(?i)"+stopWord, " ");
-        }
-
-        return text;
-    }
-
-    //TODO: Time is not getting preserved. Do we have to?
-    //TODO: Not Preserving "," not relevant with Cacm
-    private String removeNoise(String text) {
-        text = StringUtils.replaceAll(text, "(\\[[0-9]\\w{0,3}\\])", STRING_REPLACEMENT);
-        text = StringUtils.replaceAll(text, "(\\.+ )|(\\-+ )|( -+)|( \\.+)|(^-)|(^\\.)", STRING_REPLACEMENT);
-        text = StringUtils.replaceAll(text, "(\\.+ )", STRING_REPLACEMENT);
-        text = StringUtils.replaceAll(text, "(\\-+ )", STRING_REPLACEMENT);
-        text = StringUtils.replaceAll(text, "( -+)", STRING_REPLACEMENT);
-        text = StringUtils.replaceAll(text, "( \\.+)", STRING_REPLACEMENT);
-        text = StringUtils.replaceAll(text, "(^-)", STRING_REPLACEMENT);
-        text = StringUtils.replaceAll(text, "(^\\.)", STRING_REPLACEMENT);
-        text = StringUtils.replaceAll(text, "([^0-9a-zA-Z\\.\\- ])", STRING_REPLACEMENT);
-        return StringUtils.replace(text, "  ", STRING_REPLACEMENT);
     }
 
     public HashMap<String, HashMap<String, Integer>> createIndex(File[] files, Boolean writeFlag) {

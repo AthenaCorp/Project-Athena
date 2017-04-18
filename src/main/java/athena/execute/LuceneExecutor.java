@@ -16,12 +16,12 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopScoreDocCollector;
 import org.apache.lucene.store.FSDirectory;
-import org.apache.lucene.util.Version;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -29,9 +29,8 @@ import java.util.Map;
 public class LuceneExecutor {
 
     private CommonUtils commonUtils = new CommonUtils();
-
-    private static Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_47);
-    private static Analyzer Sanalyzer = new SimpleAnalyzer(Version.LUCENE_47);
+    private static Analyzer analyzer = new StandardAnalyzer();
+    private static Analyzer Sanalyzer = new SimpleAnalyzer();
 
     private IndexWriter writer;
     private ArrayList<File> queue = new ArrayList<>();
@@ -41,26 +40,29 @@ public class LuceneExecutor {
         TopScoreDocCollector collector;
         try {
             String indexLocation = commonUtils.getOutputPath() + "\\LuceneIndex";
-            if(isCreateIndex) {
+            Path indexPath = new File(indexLocation).toPath();
+            if (isCreateIndex) {
                 commonUtils.clearFolder(indexLocation);
                 String folderPath = commonUtils.getResourcePath() + "\\cacm";
-                FSDirectory dir = FSDirectory.open(new File(indexLocation));
-                IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_47, Sanalyzer);
+                FSDirectory dir = FSDirectory.open(indexPath);
+                IndexWriterConfig config = new IndexWriterConfig(Sanalyzer);
                 writer = new IndexWriter(dir, config);
                 indexFileOrDirectory(folderPath);
                 writer.close();
             }
-
-            IndexReader reader = DirectoryReader.open(FSDirectory.open(new File(indexLocation)));
-            searcher = new IndexSearcher(reader);
-            collector = TopScoreDocCollector.create(100, true);
             String outputFolder = commonUtils.getOutputPath() + "\\Lucene";
             commonUtils.verifyFolder(outputFolder);
             Map<Integer, String> queries = SearchEngineUtils.getQuerySet(commonUtils.getResourcePath() + "query\\cacm.query.txt");
+            System.out.println(queries);
             for (int j = 1; j <= queries.size(); j++) {
+                IndexReader reader = DirectoryReader.open(FSDirectory.open(indexPath));
+                searcher = new IndexSearcher(reader);
+                collector = TopScoreDocCollector.create(100);
+
                 String s = queries.get(j);
-                System.out.println("Searching: " + s);
-                Query q = new QueryParser(Version.LUCENE_47, "contents", Sanalyzer).parse(s);
+                System.out.println("Searching Query " + j  +": " + s);
+                Query q = new QueryParser("contents", Sanalyzer).parse(s);
+                System.out.println(collector);
                 searcher.search(q, collector);
                 ScoreDoc[] hits = collector.topDocs().scoreDocs;
 
@@ -138,6 +140,7 @@ public class LuceneExecutor {
 
         queue.clear();
     }
+
 
     private void addFiles(File file) {
 
