@@ -6,7 +6,7 @@ public class SpringExecutor {
         //configurator.execStemFile("cacm_stem.txt");
         //configurator.generateIndex();
         configurator.executeQuerySearching();
-        configurator.execEval();
+        //configurator.execEval();
         //configurator.executeLucene();
     }
 }

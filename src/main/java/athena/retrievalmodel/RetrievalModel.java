@@ -7,5 +7,5 @@ public interface RetrievalModel {
 
     String getModelName();
 
-    void printN(HashMap<String, Double> hashMap, Integer queryID);
+    void printN(HashMap<String, Double> hashMap, Integer queryID, String query);
 }

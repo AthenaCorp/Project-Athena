@@ -25,6 +25,8 @@ public class BM25 implements RetrievalModel {
     private Integer nGrams;
     @Value("${search.engine.print.size}")
     private Integer printSize;
+    @Value("${search.engine.snippet}")
+    private Boolean genSnippet;
 
     private static final Integer K2 = 100;
     private static final Double K1 = 1.2;
@@ -81,7 +83,8 @@ public class BM25 implements RetrievalModel {
 
 
     @Override
-    public void printN(HashMap<String, Double> hashMap, Integer queryID) {
+    public void printN(HashMap<String, Double> hashMap, Integer queryID,
+                       String query) {
         String fs = File.separator;
         String folderName = commonUtils.getOutputPath() + fs +
                 searchEngineName +
@@ -92,6 +95,7 @@ public class BM25 implements RetrievalModel {
         }
         String filePath = folderName + queryID + ".txt";
 
-        RetrievalModels.printN(hashMap, queryID, filePath, getModelName(), printSize);
+        RetrievalModels.printN(hashMap, queryID, filePath, getModelName(),
+                printSize, query, genSnippet);
     }
 }

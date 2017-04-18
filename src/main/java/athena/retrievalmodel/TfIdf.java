@@ -26,6 +26,8 @@ public class TfIdf implements RetrievalModel {
     private Integer nGrams;
     @Value("${search.engine.print.size}")
     private Integer printSize;
+    @Value("${search.engine.snippet}")
+    private Boolean genSnippet;
 
     private HashMap<String, Double> tfIdfMap = new HashMap<>();
     private HashMap<String, HashMap<String, Integer>> index;
@@ -98,7 +100,8 @@ public class TfIdf implements RetrievalModel {
     }
 
     @Override
-    public void printN(HashMap<String, Double> hashMap, Integer queryID) {
+    public void printN(HashMap<String, Double> hashMap, Integer queryID,
+                       String query) {
         String fs = File.separator;
         String folderName = commonUtils.getOutputPath() + fs + searchEngineName + fs;
         commonUtils.verifyFolder(folderName);
@@ -108,6 +111,7 @@ public class TfIdf implements RetrievalModel {
         }
         String filePath = folderName + queryID + ".txt";
 
-        RetrievalModels.printN(hashMap, queryID, filePath, getModelName(), printSize);
+        RetrievalModels.printN(hashMap, queryID, filePath, getModelName(),
+                printSize, query, genSnippet);
     }
 }
