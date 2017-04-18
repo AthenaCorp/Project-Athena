@@ -37,7 +37,7 @@ public class Executor {
 
         for(Integer i : queries.keySet()) {
             HashMap<String, Double> bm = bm25.getRanking(queries.get(i));
-            bm25.printN(bm, i);
+            bm25.printN(bm, i, queries.get(i));
         }
 
         long stopTime = commonUtils.printTimeStamp("Index Creation Completed");
@@ -59,7 +59,7 @@ public class Executor {
 
         for(Integer i : queries.keySet()) {
             HashMap<String, Double> tidf = tfIdf.getRanking(queries.get(i));
-            tfIdf.printN(tidf, i);
+            tfIdf.printN(tidf, i,  queries.get(i));
         }
 
         long stopTime = commonUtils.printTimeStamp("Index Creation Completed");

@@ -77,7 +77,7 @@ public class InvertedIndexer {
                         content = caseFoldText(content);
                     }
                     if (doStopping) {
-                        content = stoppedText(content);
+                        content = commonUtils.stoppedText(content);
                     }
                     for (int i = 0; i < noiseFactor; i++) {
                         content = removeNoise(content);
@@ -115,27 +115,7 @@ public class InvertedIndexer {
         return text.toLowerCase();
     }
 
-    private String stoppedText(String text) {
-        File file = new File(commonUtils.getResourcePath() + "\\query\\common_words.txt");
-        ArrayList<String> stopList = new ArrayList<>();
-        try {
-            FileReader fileReader = new FileReader(file);
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
-            String word = bufferedReader.readLine();
-            while (word != null) {
-                stopList.add(word);
-                word = bufferedReader.readLine();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
-        for (String stopWord : stopList) {
-            text = text.replaceAll("(?i)"+stopWord, " ");
-        }
-
-        return text;
-    }
 
     //TODO: Time is not getting preserved. Do we have to?
     //TODO: Not Preserving "," not relevant with Cacm

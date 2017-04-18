@@ -1,6 +1,7 @@
 package athena.retrievalmodel;
 
 import athena.snippetgeneration.SnippetGeneration;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.io.File;
@@ -14,9 +15,6 @@ import java.util.*;
  */
 public class RetrievalModels {
     private static final String SPLIT_CHARACTER = " ";
-
-    @Value("${search.engine.snippet}")
-    private static Boolean genSnippet;
 
     private static SnippetGeneration sn = new SnippetGeneration();
 
@@ -62,7 +60,7 @@ public class RetrievalModels {
 
     public static void printN(HashMap<String, Double> hashMap, Integer
             queryID, String filePath, String model, Integer printSize, String
-             query) {
+             query, Boolean genSnippet) {
         int k = 1;
         DecimalFormat numberFormat = new DecimalFormat("#.000");
         File file = new File(filePath);
@@ -72,8 +70,7 @@ public class RetrievalModels {
                 fileWriter.write(queryID + " Q0 " + s + " " + k + " " + numberFormat.format(hashMap.get(s)) +
                         " Athena[" + model + "]\n");
                 if(genSnippet){
-                    fileWriter.write(sn.thisSnippet(queryID, s, query) +
-                            "]\n");
+                    fileWriter.write(sn.thisSnippet(s, query));
                 }
                 k++;
                 if (k > printSize) {
