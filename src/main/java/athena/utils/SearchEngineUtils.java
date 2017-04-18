@@ -76,7 +76,7 @@ public class SearchEngineUtils {
         }
 
         for (String stopWord : stopList) {
-            text = text.replaceAll("(?i)"+stopWord, " ");
+            text = text.replaceAll(" "+stopWord+" ", " ");
         }
 
         return text;
