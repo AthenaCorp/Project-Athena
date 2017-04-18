@@ -4,6 +4,7 @@ import athena.utils.CommonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.*;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -13,9 +14,9 @@ public class SnippetGeneration {
 
     @Autowired
     private CommonUtils commonUtils;
+    String fs = File.separator;
 
     public void extractQueries(String folderPath) {
-        String fs = File.separator;
         folderPath = commonUtils.getOutputPath() + fs + folderPath;
         File folder = new File(folderPath);
         File[] files = folder.listFiles();
@@ -37,6 +38,16 @@ public class SnippetGeneration {
     public void snippetProcessing(String docId) {
         String filePath = commonUtils.getResourcePath() + "\\Athena\\DataFiles\\" + docId + ".txt";
         String fileContent = commonUtils.getTextFromFile(filePath);
+
+    }
+
+    public String thisSnippet(Integer queryID, String s, String query){
+        String filePath = commonUtils.getResourcePath() +
+                "\\Athena\\DataFiles\\" + s + ".txt";
+        List<String> lines = commonUtils.getLinesFromFile(filePath);
+        String snip = "";
+        snip = snip.concat(s);
+        return snip;
 
     }
 
