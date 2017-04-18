@@ -16,13 +16,15 @@ import java.util.Properties;
 public class SpringConfigurator {
     private Properties properties;
     private ClassPathXmlApplicationContext context;
+    private CommonUtils commonUtils;
 
     public SpringConfigurator() {
         context = new ClassPathXmlApplicationContext("spring/bean.xml");
         properties = (Properties) context.getBean("searchEngineProperties");
+        commonUtils = (CommonUtils) context.getBean("commonUtils");
     }
 
-    public void generateIndex() {
+    private void generateIndex() {
         CommonUtils commonUtils = (CommonUtils) context.getBean("commonUtils");
         long startTime = commonUtils.printTimeStamp("Index Creation Started");
         InvertedIndexer indexer = (InvertedIndexer) context.getBean("invertedIndexer");
@@ -41,7 +43,7 @@ public class SpringConfigurator {
         commonUtils.printTotalTime(startTime, stopTime);
     }
 
-    public void retrieveRanking(String query, Integer queryID) {
+    private void retrieveRanking(String query, Integer queryID) {
         RetrievalModel retrievalModel = (RetrievalModel) context.getBean("retrievalModel");
         if (properties.getProperty("search.engine.enable.query.expansion").equals("false")) {
             retrievalModel.printN(retrievalModel.getRanking(query), queryID,
@@ -52,21 +54,13 @@ public class SpringConfigurator {
         }
     }
 
-    public void executeQuerySearching() {
-        CommonUtils commonUtils = (CommonUtils) context.getBean("commonUtils");
+    public void executeQuerySearching(Boolean createIndex) {
         long startTime = commonUtils.printTimeStamp("Ranking Started");
-
-        InvertedIndexer indexer = (InvertedIndexer) context.getBean("invertedIndexer");
-        String resourceFolder = commonUtils.getResourcePath();
-        String indexFolder = resourceFolder + properties.getProperty("search.engine.index.folder") + "\\";
-        indexer.setIndexFolder(indexFolder);
-        setRetrievalModel();
-        Boolean doCaseFolding = Boolean.parseBoolean(properties.getProperty("search.engine.enable.case.fold"));
-        Boolean doStopping = Boolean.parseBoolean(properties.getProperty("search.engine.enable.stopping"));
-        Map<Integer, String> queries = SearchEngineUtils.getQuerySet(commonUtils.getResourcePath()
-                + "query\\cacm.query.txt");
-        for (int i = 1; i <= queries.size(); i++) {
-            retrieveRanking(queries.get(i), i);
+        Boolean isLuceneEnabled = Boolean.parseBoolean(properties.getProperty("search.engine.enable.lucene"));
+        if (isLuceneEnabled) {
+            executeLucene(createIndex);
+        } else {
+            executeAthena(createIndex);
         }
         long stopTime = commonUtils.printTimeStamp("Ranking Completed");
         commonUtils.printTotalTime(startTime, stopTime);
@@ -86,15 +80,15 @@ public class SpringConfigurator {
         commonUtils.printTotalTime(startTime, stopTime);
     }
 
-    public ClassPathXmlApplicationContext getContext() {
+    private ClassPathXmlApplicationContext getContext() {
         return context;
     }
 
-    public Properties getProperties() {
+    private Properties getProperties() {
         return properties;
     }
 
-    public void setRetrievalModel() {
+    private void setRetrievalModel() {
         ConfigurableEnvironment environment = context.getEnvironment();
         environment.addActiveProfile("default");
         String retrievalModel = properties.getProperty("search.engine.retrieval.model");
@@ -115,23 +109,42 @@ public class SpringConfigurator {
         context.refresh();
     }
 
-    public void execStemFile(String filename) {
+    private void execStemFile(String filename) {
         TextFileParser t = (TextFileParser) context.getBean("textFileParser");
         t.splitTextFile(filename);
     }
 
-    public void execEval() {
-        EffectivenessEvaluation e = (EffectivenessEvaluation) context.getBean
-                ("effectivenessEvaluation");
-        e.evaluation(properties.getProperty("search.engine.name"));
+    public void executeEvaluation() {
+        EffectivenessEvaluation e = (EffectivenessEvaluation) context.getBean("effectivenessEvaluation");
+        Boolean isLuceneEnabled = Boolean.parseBoolean(properties.getProperty("search.engine.enable.lucene"));
+        if (isLuceneEnabled) {
+            e.evaluation("Lucene");
+        } else {
+            e.evaluation(properties.getProperty("search.engine.name"));
+        }
     }
 
-    public void executeLucene() {
-        CommonUtils commonUtils = (CommonUtils) context.getBean("commonUtils");
-        long startTime = commonUtils.printTimeStamp("Lucene Searching Started");
+    private void executeLucene(Boolean createIndex) {
         LuceneExecutor luceneExecutor = new LuceneExecutor();
-        luceneExecutor.executor(false);
-        long stopTime = commonUtils.printTimeStamp("Lucene Searching Completed");
-        commonUtils.printTotalTime(startTime, stopTime);
+        luceneExecutor.executor(createIndex);
+    }
+
+    private void executeAthena(Boolean createIndex) {
+        String filePath = "query\\cacm.query.txt";
+        if(createIndex) {
+            generateIndex();
+        }
+        InvertedIndexer indexer = (InvertedIndexer) context.getBean("invertedIndexer");
+        String resourceFolder = commonUtils.getResourcePath();
+        String indexFolder = resourceFolder + properties.getProperty("search.engine.index.folder") + "\\";
+        indexer.setIndexFolder(indexFolder);
+        setRetrievalModel();
+        Boolean doCaseFolding = Boolean.parseBoolean(properties.getProperty("search.engine.enable.case.fold"));
+        Boolean doStopping = Boolean.parseBoolean(properties.getProperty("search.engine.enable.stopping"));
+        Map<Integer, String> queries = SearchEngineUtils.getQuerySet(commonUtils.getResourcePath()
+                + filePath, doCaseFolding, doStopping);
+        for (int i = 1; i <= queries.size(); i++) {
+            retrieveRanking(queries.get(i), i);
+        }
     }
 }
