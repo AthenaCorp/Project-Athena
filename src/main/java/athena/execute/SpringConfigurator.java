@@ -61,6 +61,8 @@ public class SpringConfigurator {
         String indexFolder = resourceFolder + properties.getProperty("search.engine.index.folder") + "\\";
         indexer.setIndexFolder(indexFolder);
         setRetrievalModel();
+        Boolean doCaseFolding = Boolean.parseBoolean(properties.getProperty("search.engine.enable.case.fold"));
+        Boolean doStopping = Boolean.parseBoolean(properties.getProperty("search.engine.enable.stopping"));
         Map<Integer, String> queries = SearchEngineUtils.getQuerySet(commonUtils.getResourcePath()
                 + "query\\cacm.query.txt");
         for (int i = 1; i <= queries.size(); i++) {
@@ -125,7 +127,11 @@ public class SpringConfigurator {
     }
 
     public void executeLucene() {
+        CommonUtils commonUtils = (CommonUtils) context.getBean("commonUtils");
+        long startTime = commonUtils.printTimeStamp("Lucene Searching Started");
         LuceneExecutor luceneExecutor = new LuceneExecutor();
         luceneExecutor.executor(false);
+        long stopTime = commonUtils.printTimeStamp("Lucene Searching Completed");
+        commonUtils.printTotalTime(startTime, stopTime);
     }
 }

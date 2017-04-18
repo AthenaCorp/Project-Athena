@@ -20,6 +20,10 @@ public class SearchEngineUtils {
     private static CommonUtils commonUtils = new CommonUtils();
 
     public static Map<Integer, String> getQuerySet(String filename) {
+        return getQuerySet(filename, true, false);
+    }
+
+    public static Map<Integer, String> getQuerySet(String filename, Boolean doCaseFold, Boolean doStopping) {
         Map<Integer, String> queries = new HashMap<>();
         try {
             File file = new File(filename);
@@ -27,14 +31,13 @@ public class SearchEngineUtils {
             Elements elements = content.getElementsByTag("doc");
             for (Element e : elements) {
                 String[] element = e.text().split(" ", 2);
-                queries.put(Integer.parseInt(element[0]), cleanDocumentContent(element[1], true, false));
+                queries.put(Integer.parseInt(element[0]), cleanDocumentContent(element[1], doCaseFold, doStopping));
             }
         } catch (IOException e) {
             System.err.println(e.getMessage());
         }
         return queries;
     }
-
 
     public static String cleanDocumentContent(String content, Boolean doCaseFold, Boolean doStopping) {
         return cleanDocumentContent(content, doCaseFold, doStopping, 1);
@@ -84,6 +87,7 @@ public class SearchEngineUtils {
     public static String removeNoise(String text) {
         text = StringUtils.replaceAll(text, "(\\[[0-9]\\w{0,3}\\])", STRING_REPLACEMENT);
         text = StringUtils.replaceAll(text, "(\\.+ )|(\\-+ )|( -+)|( \\.+)|(^-)|(^\\.)", STRING_REPLACEMENT);
+        text = StringUtils.replaceAll(text, "--", STRING_REPLACEMENT);
         text = StringUtils.replaceAll(text, "(\\.+ )", STRING_REPLACEMENT);
         text = StringUtils.replaceAll(text, "(\\-+ )", STRING_REPLACEMENT);
         text = StringUtils.replaceAll(text, "( -+)", STRING_REPLACEMENT);

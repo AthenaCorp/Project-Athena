@@ -53,34 +53,28 @@ public class LuceneExecutor {
             String outputFolder = commonUtils.getOutputPath() + "\\Lucene";
             commonUtils.verifyFolder(outputFolder);
             Map<Integer, String> queries = SearchEngineUtils.getQuerySet(commonUtils.getResourcePath() + "query\\cacm.query.txt");
-            System.out.println(queries);
             for (int j = 1; j <= queries.size(); j++) {
                 IndexReader reader = DirectoryReader.open(FSDirectory.open(indexPath));
                 searcher = new IndexSearcher(reader);
                 collector = TopScoreDocCollector.create(100);
 
                 String s = queries.get(j);
-                System.out.println("Searching Query " + j  +": " + s);
                 Query q = new QueryParser("contents", Sanalyzer).parse(s);
-                System.out.println(collector);
                 searcher.search(q, collector);
                 ScoreDoc[] hits = collector.topDocs().scoreDocs;
 
-                // 4. display results
-                System.out.println("Found " + hits.length + " hits.");
-                FileWriter fileWriter = new FileWriter(new File(outputFolder + "\\1.txt"));
+                FileWriter fileWriter = new FileWriter(new File(outputFolder + "\\" + j + ".txt"));
                 for (int i = 0; i < hits.length; ++i) {
                     int docId = hits[i].doc;
                     Document d = searcher.doc(docId);
                     fileWriter.write(1 + " Q0 " + d.get("filename") + " " + (i + 1) + " " + hits[i].score + " Lucene\n");
                 }
-                // 5. term stats --> watch out for which "version" of the term
-                // must be checked here instead!
+
                 fileWriter.close();
-                Term termInstance = new Term("contents", s);
-                long termFreq = reader.totalTermFreq(termInstance);
-                long docCount = reader.docFreq(termInstance);
-                System.out.println(s + " Term Frequency " + termFreq + " - Document Frequency " + docCount + "\n");
+                //Term termInstance = new Term("contents", s);
+                //long termFreq = reader.totalTermFreq(termInstance);
+                //long docCount = reader.docFreq(termInstance);
+                //System.out.println(s + " Term Frequency " + termFreq + " - Document Frequency " + docCount);
             }
         } catch (Exception ex) {
             ex.printStackTrace();
