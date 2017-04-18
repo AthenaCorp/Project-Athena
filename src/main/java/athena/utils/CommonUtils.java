@@ -4,9 +4,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -130,7 +128,7 @@ public class CommonUtils {
         }
     }
 
-    public List<String> getTextFromFile(String filename){
+    public List<String> getLinesFromFile(String filename){
         List<String> lines = null;
         try {
             lines = Files.readAllLines (Paths.get (filename),
@@ -142,5 +140,21 @@ public class CommonUtils {
             System.out.println (e);
         }
         return lines;
+    }
+
+    public String getTextFromFile(String filename){
+        String content = "";
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(new File(filename)));
+            String c =  br.readLine();
+            while(c != null) {
+                content += c;
+                c = br.readLine();
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return content;
     }
 }
