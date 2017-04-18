@@ -122,4 +122,9 @@ public class SpringConfigurator {
                 ("effectivenessEvaluation");
         e.evaluation(properties.getProperty("search.engine.name"));
     }
+
+    public void executeLucene() {
+        LuceneExecutor luceneExecutor = new LuceneExecutor();
+        luceneExecutor.executor();
+    }
 }
