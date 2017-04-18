@@ -175,26 +175,4 @@ public class CommonUtils {
         }
         folder.delete();
     }
-
-    public String stoppedText(String text) {
-        File file = new File(getResourcePath() + "\\query\\common_words");
-        ArrayList<String> stopList = new ArrayList<>();
-        try {
-            FileReader fileReader = new FileReader(file);
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
-            String word = bufferedReader.readLine();
-            while (word != null) {
-                stopList.add(word);
-                word = bufferedReader.readLine();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        for (String stopWord : stopList) {
-            text = text.replaceAll("(?i)"+stopWord, " ");
-        }
-
-        return text;
-    }
 }

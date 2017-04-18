@@ -100,8 +100,7 @@ public class TfIdf implements RetrievalModel {
     }
 
     @Override
-    public void printN(HashMap<String, Double> hashMap, Integer queryID,
-                       String query) {
+    public void printN(HashMap<String, Double> hashMap, Integer queryID, String query) {
         String fs = File.separator;
         String folderName = commonUtils.getOutputPath() + fs + searchEngineName + fs;
         commonUtils.verifyFolder(folderName);
