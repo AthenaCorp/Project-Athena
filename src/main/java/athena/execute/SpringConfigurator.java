@@ -44,10 +44,11 @@ public class SpringConfigurator {
     public void retrieveRanking(String query, Integer queryID) {
         RetrievalModel retrievalModel = (RetrievalModel) context.getBean("retrievalModel");
         if (properties.getProperty("search.engine.enable.query.expansion").equals("false")) {
-            retrievalModel.printN(retrievalModel.getRanking(query), queryID);
+            retrievalModel.printN(retrievalModel.getRanking(query), queryID,
+                    query);
         } else {
             PseudoRelevanceFeedback feedback = (PseudoRelevanceFeedback) context.getBean("pseudoRelevanceFeedback");
-            retrievalModel.printN(feedback.getRanking(query), queryID);
+            retrievalModel.printN(feedback.getRanking(query), queryID, query);
         }
     }
 

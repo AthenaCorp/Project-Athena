@@ -45,6 +45,10 @@ public class SnippetGeneration {
         String filePath = commonUtils.getResourcePath() +
                 "\\Athena\\DataFiles\\" + s + ".txt";
         List<String> lines = commonUtils.getLinesFromFile(filePath);
+        for(int i=0; i<lines.size(); i++) {
+            String[] tuple;
+            tuple = lines.get(i).split(" ");
+        }
         String snip = "";
         snip = snip.concat(s);
         return snip;

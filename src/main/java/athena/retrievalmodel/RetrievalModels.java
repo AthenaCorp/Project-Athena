@@ -1,5 +1,8 @@
 package athena.retrievalmodel;
 
+import athena.snippetgeneration.SnippetGeneration;
+import org.springframework.beans.factory.annotation.Value;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -11,6 +14,11 @@ import java.util.*;
  */
 public class RetrievalModels {
     private static final String SPLIT_CHARACTER = " ";
+
+    @Value("${search.engine.snippet}")
+    private static Boolean genSnippet;
+
+    private static SnippetGeneration sn = new SnippetGeneration();
 
     // Split the whole query into separate words and counts
     public static HashMap<String, Integer> getQueryMap(String query, Integer nGrams) {
@@ -52,7 +60,9 @@ public class RetrievalModels {
         return hashMap1;
     }
 
-    public static void printN(HashMap<String, Double> hashMap, Integer queryID, String filePath, String model, Integer printSize) {
+    public static void printN(HashMap<String, Double> hashMap, Integer
+            queryID, String filePath, String model, Integer printSize, String
+             query) {
         int k = 1;
         DecimalFormat numberFormat = new DecimalFormat("#.000");
         File file = new File(filePath);
@@ -61,6 +71,10 @@ public class RetrievalModels {
             for (String s : hashMap.keySet()) {
                 fileWriter.write(queryID + " Q0 " + s + " " + k + " " + numberFormat.format(hashMap.get(s)) +
                         " Athena[" + model + "]\n");
+                if(genSnippet){
+                    fileWriter.write(sn.thisSnippet(queryID, s, query) +
+                            "]\n");
+                }
                 k++;
                 if (k > printSize) {
                     break;
