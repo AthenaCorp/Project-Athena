@@ -1,6 +1,7 @@
 package athena.snippetgeneration;
 
 import athena.utils.CommonUtils;
+import athena.utils.SearchEngineUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -46,6 +47,7 @@ public class SnippetGeneration {
 
     public String thisSnippet(String docName, String query){
         String[] queryArray = query.split(" ");
+        query = SearchEngineUtils.stoppedText(query);
         //System.out.println(query);
         //query = commonUtils.stoppedText(query);
         //System.out.println(query);
@@ -55,17 +57,18 @@ public class SnippetGeneration {
         List<String> lines = commonUtils.getLinesFromFile(filePath);
         HashMap<String, Double> sigMap = new HashMap<>();
         for(int i=0; i<lines.size(); i++) {
-            if(lines.equals("\n")){
+            String thisLine = lines.get(i);
+            if(thisLine.length() == 0){
                 continue;
             }
+            thisLine = thisLine.replace(",","");
+            thisLine = thisLine.replace(".","");
+            thisLine = thisLine.replace("\n","");
             double sig = 0.0;
             String snippet1 = "";
-            String[] tuple;
-            tuple = lines.get(i).split(" ");
-            for (String word: tuple
-                 ) {
-                word = word.replace(",","");
-                word = word.replace(".","");
+            String[] lineArray;
+            lineArray = thisLine.split(" ");
+            for (String word: lineArray) {
                 if(query.contains(word)){
                     sig += 1;
                     snippet1 = snippet1.concat(word.toUpperCase()+" ");
@@ -73,15 +76,14 @@ public class SnippetGeneration {
                     snippet1 = snippet1.concat(word+" ");
                 }
             }
-            sig = sig * sig / tuple.length;
+            sig = sig * sig / lineArray.length;
             sigMap.put(snippet1,sig);
         }
         String snippet = "";
         int count = 0;
         sigMap = sortBM(sigMap);
         for (String snip: sigMap.keySet()) {
-            snippet = snippet.concat(snip);
-            snippet = snippet.concat("\n");
+            snippet = snippet.concat(snip+"\n");
             count+= 1;
             if(count == 4){
                 snippet = snippet.concat("\n");
