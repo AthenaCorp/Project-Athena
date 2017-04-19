@@ -45,6 +45,7 @@ public class SpringConfigurator {
 
     private void retrieveRanking(String query, Integer queryID) {
         RetrievalModel retrievalModel = (RetrievalModel) context.getBean("retrievalModel");
+
         if (properties.getProperty("search.engine.enable.query.expansion").equals("false")) {
             retrievalModel.printN(retrievalModel.getRanking(query), queryID,
                     query);
@@ -57,6 +58,9 @@ public class SpringConfigurator {
     public void executeQuerySearching(Boolean createIndex) {
         long startTime = commonUtils.printTimeStamp("Ranking Started");
         Boolean isLuceneEnabled = Boolean.parseBoolean(properties.getProperty("search.engine.enable.lucene"));
+        commonUtils.cleanFolder(commonUtils.getOutputPath() + properties
+                .getProperty("search" +
+                        ".engine.name"));
         if (isLuceneEnabled) {
             executeLucene(createIndex);
         } else {
@@ -131,7 +135,7 @@ public class SpringConfigurator {
 
     private void executeAthena(Boolean createIndex) {
         String filePath = "query\\cacm.query.txt";
-        if(createIndex) {
+        if (createIndex) {
             generateIndex();
         }
         InvertedIndexer indexer = (InvertedIndexer) context.getBean("invertedIndexer");

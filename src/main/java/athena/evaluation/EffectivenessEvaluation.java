@@ -22,9 +22,10 @@ public class EffectivenessEvaluation {
         double mean;
         String fs = File.separator;
         folderPath = commonUtils.getOutputPath() + fs + folderPath;
-        calculatePAtK(folderPath);
         File folder = new File(folderPath);
         File[] files = folder.listFiles();
+
+        calculatePAtK(folderPath);
         if (files == null) {
             System.out.println("No files present or invalid folder");
         } else {
@@ -139,7 +140,10 @@ public class EffectivenessEvaluation {
         String[] tuple;
         tuple = lines.get(0).split(" ");
 
-        File file = new File(folderPath + "\\" + tuple[0] + "_prvalues.txt");
+        String resultFolderPath = folderPath.concat("\\eval_results");
+
+        File file = new File(resultFolderPath + "\\" + tuple[0] + "_prvalues" +
+                ".txt");
         FileWriter fileWriter;
         try {
             fileWriter = new FileWriter(file);
@@ -172,7 +176,9 @@ public class EffectivenessEvaluation {
                 }
 
             }
-            File file = new File(folderPath + "\\" + "pAtK.txt");
+            commonUtils.verifyFolder(folderPath + "\\eval_results");
+            String resultFolderPath = folderPath.concat("\\eval_results");
+            File file = new File(resultFolderPath + "\\" + "pAtK.txt");
             FileWriter fileWriter;
             try {
                 fileWriter = new FileWriter(file);

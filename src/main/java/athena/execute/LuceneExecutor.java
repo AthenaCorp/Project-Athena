@@ -54,6 +54,7 @@ public class LuceneExecutor {
             }
             String outputFolder = commonUtils.getOutputPath() + "\\Lucene";
             commonUtils.verifyFolder(outputFolder);
+            commonUtils.cleanFolder(outputFolder);
             Map<Integer, String> queries = SearchEngineUtils.getQuerySet(commonUtils.getResourcePath() + "query\\cacm.query.txt");
             String filename;
             for (int j = 1; j <= queries.size(); j++) {
@@ -76,7 +77,7 @@ public class LuceneExecutor {
                 for (int i = 0; i < hits.length; ++i) {
                     int docId = hits[i].doc;
                     Document d = searcher.doc(docId);
-                    fileWriter.write(1 + " Q0 " + StringUtils.remove(d.get
+                    fileWriter.write(j + " Q0 " + StringUtils.remove(d.get
                             ("filename"), ".html") +
                             "" +
                             " " +
