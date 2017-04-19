@@ -36,9 +36,6 @@ public class SpringConfigurator {
         } else {
             inputFolder = resourceFolder + properties.getProperty("search.engine.input.folder") + "\\";
         }
-        String indexFolder = resourceFolder + properties.getProperty("search.engine.index.folder") + "\\";
-        indexer.setIndexFolder(indexFolder);
-        commonUtils.cleanFolder(indexFolder);
         indexer.createIndex(inputFolder);
         long stopTime = commonUtils.printTimeStamp("Index Creation Completed");
         commonUtils.printTotalTime(startTime, stopTime);
@@ -71,10 +68,6 @@ public class SpringConfigurator {
     public void executePseudoRelevanceFeedback() {
         CommonUtils commonUtils = (CommonUtils) context.getBean("commonUtils");
         long startTime = commonUtils.printTimeStamp("Query Expansion Started");
-        InvertedIndexer indexer = (InvertedIndexer) context.getBean("invertedIndexer");
-        String resourceFolder = commonUtils.getResourcePath();
-        String indexFolder = resourceFolder + properties.getProperty("search.engine.index.folder") + "\\";
-        indexer.setIndexFolder(indexFolder);
         setRetrievalModel();
         PseudoRelevanceFeedback feedback = (PseudoRelevanceFeedback) context.getBean("pseudoRelevanceFeedback");
         System.out.println(feedback.expandQuery("samelson", 1));
@@ -111,11 +104,6 @@ public class SpringConfigurator {
         context.refresh();
     }
 
-    private void execStemFile(String filename) {
-        TextFileParser t = (TextFileParser) context.getBean("textFileParser");
-        t.splitTextFile(filename);
-    }
-
     public void executeEvaluation() {
         EffectivenessEvaluation e = (EffectivenessEvaluation) context.getBean("effectivenessEvaluation");
         Boolean isLuceneEnabled = Boolean.parseBoolean(properties.getProperty("search.engine.enable.lucene"));
@@ -136,16 +124,10 @@ public class SpringConfigurator {
         if (createIndex) {
             generateIndex();
         }
-        InvertedIndexer indexer = (InvertedIndexer) context.getBean("invertedIndexer");
         String resourceFolder = commonUtils.getResourcePath();
-        String indexFolder = resourceFolder + properties.getProperty("search.engine.index.folder") + "\\";
-        indexer.setIndexFolder(indexFolder);
         setRetrievalModel();
         Boolean doCaseFolding = Boolean.parseBoolean(properties.getProperty("search.engine.enable.case.fold"));
         Boolean doStopping = Boolean.parseBoolean(properties.getProperty("search.engine.enable.stopping"));
-        /*Map<Integer, String> queries = new HashMap<>();
-        queries.put(13, "code optimization for space efficiency");
-        retrieveRanking(queries.get(13), 13);*/
         Map<Integer, String> queries = SearchEngineUtils.getQuerySet(resourceFolder + filePath, doCaseFolding, doStopping);
 
         for (int i = 1; i <= queries.size(); i++) {

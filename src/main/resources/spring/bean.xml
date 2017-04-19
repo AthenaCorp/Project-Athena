@@ -15,7 +15,9 @@
 
     <beans profile="default">
         <bean id="commonUtils" class="athena.utils.CommonUtils"/>
-        <bean id="invertedIndexer" class="athena.index.InvertedIndexer" depends-on="commonUtils"/>
+        <bean id="invertedIndexer" class="athena.index.InvertedIndexer" depends-on="commonUtils">
+            <constructor-arg type = "java.lang.String" value = "${search.engine.index.folder}"/>
+        </bean>
         <bean id="retrievalModel" class="athena.retrievalmodel.BM25"/>
         <context:component-scan base-package="athena"/>
     </beans>

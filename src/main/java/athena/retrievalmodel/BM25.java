@@ -33,7 +33,6 @@ public class BM25 implements RetrievalModel {
     private static final Double K1 = 1.2;
     private static final Double B = 0.75;
 
-
     public HashMap<String, Double> getRanking(String query, Integer queryID) {
         return calculateBM25(query, queryID);
     }
@@ -108,6 +107,6 @@ public class BM25 implements RetrievalModel {
             folderName = folderName + "0";
         }
         String filePath = folderName + queryID + ".txt";
-        RetrievalModels.printN(hashMap, queryID, filePath, getModelName(), printSize, query, genSnippet);
+        RetrievalModels.printN(hashMap, queryID, filePath, searchEngineName, printSize, query, genSnippet);
     }
 }

@@ -67,7 +67,7 @@ public class CommonUtils {
             totalTime = totalTime % MILLI_TIME_FACTOR;
             timeString = getTotalTime(newTime, index + 1) + " " + totalTime + " " + unitList[index];
         }
-        System.out.println("Total Time: " + timeString);
+        System.out.println("Total Time: " + timeString + "\n");
     }
 
     private String getTotalTime(long totalTime, int index) {

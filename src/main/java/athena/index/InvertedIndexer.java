@@ -28,7 +28,6 @@ public class InvertedIndexer {
     private String indexFolder;
     private String dataFolder;
 
-    private final static String FOLDER_INDEX = "\\Athena\\";
     private final static String FILE_ENCODING = "UTF-8";
     private final static String STRING_SPLIT = " ";
 
@@ -36,20 +35,14 @@ public class InvertedIndexer {
     private CrawlerUtils crawlerUtils;
     private CommonUtils commonUtils = new CommonUtils();
 
-    public InvertedIndexer() {
-        this.indexFolder = commonUtils.getResourcePath() + FOLDER_INDEX;
+    public InvertedIndexer(String folderName) {
+        indexFolder = commonUtils.getOutputPath() + "\\" + folderName + "\\";
         commonUtils.verifyFolder(indexFolder);
         setDataFolder(indexFolder);
     }
 
     public String getIndexFolder() {
         return indexFolder;
-    }
-
-    public void setIndexFolder(String indexFolder) {
-        this.indexFolder = indexFolder;
-        commonUtils.verifyFolder(indexFolder);
-        setDataFolder(indexFolder);
     }
 
     private void setDataFolder(String indexFolder) {
@@ -153,11 +146,9 @@ public class InvertedIndexer {
     }
 
     public void createIndex(String inputFolder) {
-        System.out.println(inputFolder);
         tokenizeHTMLFiles(inputFolder);
         File folder = new File(dataFolder);
         File[] files = folder.listFiles();
-        System.out.println(files.length);
         createIndex(files, true);
     }
 
