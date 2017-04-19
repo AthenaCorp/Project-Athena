@@ -48,28 +48,26 @@ public class BM25 implements RetrievalModel {
         Double averageTokenCount = RetrievalModels.getAverageTokenCount(tokenCountMap);
         Integer totalDocumentCount = tokenCountMap.size();
 
-        HashMap<String, Integer> documentList;
-        Set<String> documentKeySet;
+        HashMap<String, Integer> terms;
+        Set<String> termKeySet;
         HashMap<String, Integer> queryMap = RetrievalModels.getQueryMap(query, nGrams);
         Set<String> queryWords = queryMap.keySet();
 
         for (String s : queryWords) {
-            documentList = index.get(s);
-            if (documentList != null) {
-                documentKeySet = documentList.keySet();
-                Integer termDocumentCount = documentKeySet.size();
-                Integer termQueryCount = queryMap.get(s);
-                Double numerator = 1.0;
-                Double denominator = (termDocumentCount + 0.5) / (totalDocumentCount - termDocumentCount + 0.5);
-                Double value = Math.log(numerator / denominator);
-                for (String docID : documentKeySet) {
-                    value = value * (((K1 + 1) * documentList.get(docID)) / (calculateK(tokenCountMap.get(docID), averageTokenCount) +
-                            documentList.get(docID)));
+            terms = index.get(s);
+            if (terms != null) {
+                termKeySet = terms.keySet();
+                Integer termDocumentCount = termKeySet.size();
+                for (String t : termKeySet) {
+                    Integer termQueryCount = queryMap.get(s);
+                    Double value = Math.log((totalDocumentCount - termDocumentCount + 0.5) / (termDocumentCount + 0.5));
+                    value = value * (((K1 + 1) * terms.get(t)) / (calculateK(tokenCountMap.get(t), averageTokenCount) +
+                            terms.get(t)));
                     value = value * (((K2 + 1) * termQueryCount) / (K2 + termQueryCount));
-                    if (bm25Map.containsKey(docID)) {
-                        bm25Map.put(docID, bm25Map.get(docID) + value);
+                    if (bm25Map.containsKey(t)) {
+                        bm25Map.put(t, bm25Map.get(t) + value);
                     } else {
-                        bm25Map.put(docID, value);
+                        bm25Map.put(t, value);
                     }
                 }
             }
