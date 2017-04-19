@@ -1,16 +1,15 @@
 package athena.execute;
 
-import athena.TextFileParser;
 import athena.evaluation.EffectivenessEvaluation;
 import athena.index.InvertedIndexer;
 import athena.queryexpansion.PseudoRelevanceFeedback;
 import athena.retrievalmodel.RetrievalModel;
 import athena.utils.CommonUtils;
 import athena.utils.SearchEngineUtils;
+import athena.utils.TextFileParser;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
@@ -32,6 +31,7 @@ public class SpringConfigurator {
         String resourceFolder = commonUtils.getResourcePath();
         String inputFolder;
         if (Boolean.getBoolean(properties.getProperty("search.engine.enable.stemming"))) {
+            createStemDocuments();
             inputFolder = resourceFolder + properties.getProperty("search.engine.steminput.folder") + "\\";
         } else {
             inputFolder = resourceFolder + properties.getProperty("search.engine.input.folder") + "\\";
@@ -62,16 +62,6 @@ public class SpringConfigurator {
             executeAthena(createIndex);
         }
         long stopTime = commonUtils.printTimeStamp("Ranking Completed");
-        commonUtils.printTotalTime(startTime, stopTime);
-    }
-
-    public void executePseudoRelevanceFeedback() {
-        CommonUtils commonUtils = (CommonUtils) context.getBean("commonUtils");
-        long startTime = commonUtils.printTimeStamp("Query Expansion Started");
-        setRetrievalModel();
-        PseudoRelevanceFeedback feedback = (PseudoRelevanceFeedback) context.getBean("pseudoRelevanceFeedback");
-        System.out.println(feedback.expandQuery("samelson", 1));
-        long stopTime = commonUtils.printTimeStamp("Query Expansion Completed");
         commonUtils.printTotalTime(startTime, stopTime);
     }
 
@@ -133,5 +123,10 @@ public class SpringConfigurator {
         for (int i = 1; i <= queries.size(); i++) {
             retrieveRanking(queries.get(i), i);
         }
+    }
+
+    private void createStemDocuments() {
+        TextFileParser t = (TextFileParser) context.getBean("textFileParser");
+        t.splitTextFile();
     }
 }
