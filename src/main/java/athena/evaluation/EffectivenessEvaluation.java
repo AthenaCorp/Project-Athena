@@ -1,6 +1,7 @@
 package athena.evaluation;
 
 import athena.utils.CommonUtils;
+import athena.utils.SearchEngineUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -56,7 +57,7 @@ public class EffectivenessEvaluation {
         double count = 0.0;
         String[] tuple;
         tuple = lines.get(0).split(" ");
-        ArrayList<String> relevantDocs = getRelevance(Integer.parseInt(tuple[0]));
+        ArrayList<String> relevantDocs = SearchEngineUtils.getRelevance(Integer.parseInt(tuple[0]));
         for (String line : lines) {
             tuple = line.split(" ");
             count += 1.0;
@@ -74,7 +75,7 @@ public class EffectivenessEvaluation {
         double totalPrecision = 0.0;
         String[] tuple;
         tuple = lines.get(0).split(" ");
-        ArrayList<String> relevantDocs = getRelevance(Integer.parseInt(tuple[0]));
+        ArrayList<String> relevantDocs = SearchEngineUtils.getRelevance(Integer.parseInt(tuple[0]));
         for (String line : lines) {
             tuple = line.split(" ");
             count += 1.0;
@@ -98,7 +99,7 @@ public class EffectivenessEvaluation {
         double totalPrecision;
         String[] tuple;
         tuple = lines.get(0).split(" ");
-        ArrayList<String> relevantDocs = getRelevance(Integer.parseInt(tuple[0]));
+        ArrayList<String> relevantDocs = SearchEngineUtils.getRelevance(Integer.parseInt(tuple[0]));
         for (String line : lines) {
             tuple = line.split(" ");
             count += 1.0;
@@ -117,7 +118,7 @@ public class EffectivenessEvaluation {
         double totalRecall;
         String[] tuple;
         tuple = lines.get(0).split(" ");
-        ArrayList<String> relevantDocs = getRelevance(Integer.parseInt(tuple[0]));
+        ArrayList<String> relevantDocs = SearchEngineUtils.getRelevance(Integer.parseInt(tuple[0]));
         for (String line : lines) {
             tuple = line.split(" ");
             if (relevantDocs.contains(tuple[2])) {
@@ -156,9 +157,7 @@ public class EffectivenessEvaluation {
     }
 
     private void calculatePAtK(String folderPath) {
-
         String fs = File.separator;
-
         File folder = new File(folderPath);
         File[] files = folder.listFiles();
         String line = "";
@@ -209,19 +208,5 @@ public class EffectivenessEvaluation {
         return line;
 
 
-    }
-
-    private ArrayList<String> getRelevance(int queryNumber) {
-        String[] tuple;
-        String filename = commonUtils.getResourcePath() + "//query//cacm.rel";
-        List<String> lines = commonUtils.getLinesFromFile(filename);
-        ArrayList<String> relevantDocs = new ArrayList<>();
-        for (String line : lines) {
-            tuple = line.split(" ");
-            if (Integer.parseInt(tuple[0]) == queryNumber) {
-                relevantDocs.add(tuple[2]);
-            }
-        }
-        return relevantDocs;
     }
 }

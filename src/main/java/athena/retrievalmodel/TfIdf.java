@@ -64,8 +64,7 @@ public class TfIdf implements RetrievalModel {
             double totalTerms = tokenCountMap.get(docId);
             if (totalTerms == 0) {
                 return 0;
-            }
-            else return num / totalTerms;
+            } else return num / totalTerms;
         } else {
             return 0;
         }
@@ -73,18 +72,16 @@ public class TfIdf implements RetrievalModel {
 
     private double calculateIdf(String queryTerm, Integer totalDocumentCount) {
         // number of docs with term t in it
-        if(index.containsKey(queryTerm)) {
+        if (index.containsKey(queryTerm)) {
             double num = index.get(queryTerm).size();
-            if(num == 0) {
+            if (num == 0) {
                 return 0;
-            }
-            else return Math.log(totalDocumentCount / num);
-        }
-        else return 0;
+            } else return Math.log(totalDocumentCount / num);
+        } else return 0;
     }
 
     @Override
-    public HashMap<String, Double> getRanking(String query) {
+    public HashMap<String, Double> getRanking(String query, Integer queryID) {
         setIndexAndTokenMap();
         return calculateTfIdf(query);
     }

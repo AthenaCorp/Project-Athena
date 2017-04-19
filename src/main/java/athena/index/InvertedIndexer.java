@@ -30,12 +30,11 @@ public class InvertedIndexer {
 
     private final static String FOLDER_INDEX = "\\Athena\\";
     private final static String FILE_ENCODING = "UTF-8";
-    private final static String STRING_REPLACEMENT = " ";
     private final static String STRING_SPLIT = " ";
 
     @Autowired
     private CrawlerUtils crawlerUtils;
-    private  CommonUtils commonUtils = new CommonUtils();
+    private CommonUtils commonUtils = new CommonUtils();
 
     public InvertedIndexer() {
         this.indexFolder = commonUtils.getResourcePath() + FOLDER_INDEX;
@@ -58,7 +57,6 @@ public class InvertedIndexer {
         commonUtils.verifyFolder(dataFolder);
     }
 
-
     public String getDataFolder() {
         return dataFolder;
     }
@@ -75,7 +73,7 @@ public class InvertedIndexer {
                 for (File file : files) {
                     content = Jsoup.parse(file, FILE_ENCODING).text();
                     content = removeNumbers(content);
-                    SearchEngineUtils.cleanDocumentContent(content, doCaseFold, doStopping, noiseFactor);
+                    content = SearchEngineUtils.cleanDocumentContent(content, doCaseFold, doStopping, noiseFactor);
                     createTokenizedFile(formatFileName(file.getName()), content);
                 }
             }
@@ -83,7 +81,8 @@ public class InvertedIndexer {
             e.printStackTrace();
         }
     }
-// TODO: fix remove numbers
+
+    // TODO: fix remove numbers
     private String removeNumbers(String content) {
         String newContent = "";
         try {
@@ -146,7 +145,7 @@ public class InvertedIndexer {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        if(writeFlag) {
+        if (writeFlag) {
             writeIndexToJsonFile(index);
             writeTokenCountToJsonFile(tokenCountMap);
         }
@@ -191,8 +190,7 @@ public class InvertedIndexer {
         return validWords;
     }
 
-    public LinkedHashMap<String, Integer> sortTermFrequency(HashMap<String,
-            Integer> hashMap) {
+    public LinkedHashMap<String, Integer> sortTermFrequency(HashMap<String, Integer> hashMap) {
         List<Map.Entry<String, Integer>> entries = new ArrayList<>(hashMap.entrySet());
         entries.sort((a, b) -> Integer.compare(b.getValue(), a.getValue()));
 

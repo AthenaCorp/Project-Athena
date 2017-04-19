@@ -36,7 +36,7 @@ public class Executor {
         queries.put(4, "light bulb bulbs alternative alternatives");
 
         for(Integer i : queries.keySet()) {
-            HashMap<String, Double> bm = bm25.getRanking(queries.get(i));
+            HashMap<String, Double> bm = bm25.getRanking(queries.get(i), i);
             bm25.printN(bm, i, queries.get(i));
         }
 
@@ -58,7 +58,7 @@ public class Executor {
         queries.put(4, "light bulb bulbs alternative alternatives");
 
         for(Integer i : queries.keySet()) {
-            HashMap<String, Double> tidf = tfIdf.getRanking(queries.get(i));
+            HashMap<String, Double> tidf = tfIdf.getRanking(queries.get(i), i);
             tfIdf.printN(tidf, i,  queries.get(i));
         }
 

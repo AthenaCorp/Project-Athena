@@ -3,7 +3,7 @@ package athena.retrievalmodel;
 import java.util.HashMap;
 
 public interface RetrievalModel {
-    HashMap<String, Double> getRanking(String query);
+    HashMap<String, Double> getRanking(String query, Integer queryID);
 
     String getModelName();
 

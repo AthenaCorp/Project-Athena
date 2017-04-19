@@ -12,6 +12,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -100,5 +101,19 @@ public class SearchEngineUtils {
         text = StringUtils.replaceAll(text, "(^\\.)", STRING_REPLACEMENT);
         text = StringUtils.replaceAll(text, "([^0-9a-zA-Z\\.\\- ])", STRING_REPLACEMENT);
         return StringUtils.replace(text, "  ", STRING_REPLACEMENT);
+    }
+
+    public static ArrayList<String> getRelevance(int queryNumber) {
+        String[] tuple;
+        String filename = commonUtils.getResourcePath() + "//query//cacm.rel";
+        List<String> lines = commonUtils.getLinesFromFile(filename);
+        ArrayList<String> relevantDocs = new ArrayList<>();
+        for (String line : lines) {
+            tuple = line.split(" ");
+            if (Integer.parseInt(tuple[0]) == queryNumber) {
+                relevantDocs.add(tuple[2]);
+            }
+        }
+        return relevantDocs;
     }
 }

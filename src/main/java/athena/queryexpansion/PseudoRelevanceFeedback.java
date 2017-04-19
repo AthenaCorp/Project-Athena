@@ -23,10 +23,10 @@ public class PseudoRelevanceFeedback {
     @Autowired
     private RetrievalModel retrievalModel;
 
-    public String expandQuery(String query) {
+    public String expandQuery(String query, Integer queryID) {
         String result = query;
 
-        HashMap<String, Double> bm25map = retrievalModel.getRanking(query);
+        HashMap<String, Double> bm25map = retrievalModel.getRanking(query, queryID);
         HashMap<String, Double> bm25mapSorted = RetrievalModels.sortBM(bm25map);
         Set<String> keySet = bm25mapSorted.keySet();
         File[] files = new File[15];
@@ -54,8 +54,8 @@ public class PseudoRelevanceFeedback {
         return result;
     }
 
-    public HashMap<String, Double> getRanking(String query) {
-        return retrievalModel.getRanking(expandQuery(query));
+    public HashMap<String, Double> getRanking(String query, Integer queryID) {
+        return retrievalModel.getRanking(expandQuery(query, queryID), queryID);
     }
 
 }

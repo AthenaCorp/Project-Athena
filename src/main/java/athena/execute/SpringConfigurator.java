@@ -10,6 +10,7 @@ import athena.utils.SearchEngineUtils;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
@@ -47,20 +48,17 @@ public class SpringConfigurator {
         RetrievalModel retrievalModel = (RetrievalModel) context.getBean("retrievalModel");
 
         if (properties.getProperty("search.engine.enable.query.expansion").equals("false")) {
-            retrievalModel.printN(retrievalModel.getRanking(query), queryID,
-                    query);
+            retrievalModel.printN(retrievalModel.getRanking(query, queryID), queryID, query);
         } else {
             PseudoRelevanceFeedback feedback = (PseudoRelevanceFeedback) context.getBean("pseudoRelevanceFeedback");
-            retrievalModel.printN(feedback.getRanking(query), queryID, query);
+            retrievalModel.printN(feedback.getRanking(query, queryID), queryID, query);
         }
     }
 
     public void executeQuerySearching(Boolean createIndex) {
         long startTime = commonUtils.printTimeStamp("Ranking Started");
         Boolean isLuceneEnabled = Boolean.parseBoolean(properties.getProperty("search.engine.enable.lucene"));
-        commonUtils.cleanFolder(commonUtils.getOutputPath() + properties
-                .getProperty("search" +
-                        ".engine.name"));
+        commonUtils.cleanFolder(commonUtils.getOutputPath() + properties.getProperty("search.engine.name"));
         if (isLuceneEnabled) {
             executeLucene(createIndex);
         } else {
@@ -79,7 +77,7 @@ public class SpringConfigurator {
         indexer.setIndexFolder(indexFolder);
         setRetrievalModel();
         PseudoRelevanceFeedback feedback = (PseudoRelevanceFeedback) context.getBean("pseudoRelevanceFeedback");
-        System.out.println(feedback.expandQuery("samelson"));
+        System.out.println(feedback.expandQuery("samelson", 1));
         long stopTime = commonUtils.printTimeStamp("Query Expansion Completed");
         commonUtils.printTotalTime(startTime, stopTime);
     }
@@ -145,8 +143,11 @@ public class SpringConfigurator {
         setRetrievalModel();
         Boolean doCaseFolding = Boolean.parseBoolean(properties.getProperty("search.engine.enable.case.fold"));
         Boolean doStopping = Boolean.parseBoolean(properties.getProperty("search.engine.enable.stopping"));
-        Map<Integer, String> queries = SearchEngineUtils.getQuerySet(commonUtils.getResourcePath()
-                + filePath, doCaseFolding, doStopping);
+        /*Map<Integer, String> queries = new HashMap<>();
+        queries.put(13, "code optimization for space efficiency");
+        retrieveRanking(queries.get(13), 13);*/
+        Map<Integer, String> queries = SearchEngineUtils.getQuerySet(resourceFolder + filePath, doCaseFolding, doStopping);
+
         for (int i = 1; i <= queries.size(); i++) {
             retrieveRanking(queries.get(i), i);
         }
