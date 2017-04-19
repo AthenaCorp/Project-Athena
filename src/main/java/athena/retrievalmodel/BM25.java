@@ -26,6 +26,8 @@ public class BM25 implements RetrievalModel {
     private Integer printSize;
     @Value("${search.engine.snippet}")
     private Boolean genSnippet;
+    @Value("${search.engine.relevance.bm25}")
+    private Boolean useRelevance;
 
     private static final Integer K2 = 100;
     private static final Double K1 = 1.2;
@@ -40,41 +42,6 @@ public class BM25 implements RetrievalModel {
     public String getModelName() {
         return "BM25";
     }
-
-    /*private HashMap<String, Double> calculateBM25(String query, Integer queryID) {
-        HashMap<String, Double> bm25Map = new HashMap<>();
-        HashMap<String, HashMap<String, Integer>> index = invertedIndexer.readIndexFromJsonFile();
-        HashMap<String, Integer> tokenCountMap = invertedIndexer.readTokenCountToJsonFile();
-        Double averageTokenCount = RetrievalModels.getAverageTokenCount(tokenCountMap);
-        Integer totalDocumentCount = tokenCountMap.size();
-
-        HashMap<String, Integer> terms;
-        Set<String> termKeySet;
-        HashMap<String, Integer> queryMap = RetrievalModels.getQueryMap(query, nGrams);
-        Set<String> queryWords = queryMap.keySet();
-
-        for (String s : queryWords) {
-            terms = index.get(s);
-            if (terms != null) {
-                termKeySet = terms.keySet();
-                Integer termDocumentCount = termKeySet.size();
-                for (String t : termKeySet) {
-                    Integer termQueryCount = queryMap.get(s);
-                    Double value = Math.log((totalDocumentCount - termDocumentCount + 0.5) / (termDocumentCount + 0.5));
-                    value = value * (((K1 + 1) * terms.get(t)) / (calculateK(tokenCountMap.get(t), averageTokenCount) +
-                            terms.get(t)));
-                    value = value * (((K2 + 1) * termQueryCount) / (K2 + termQueryCount));
-                    if (bm25Map.containsKey(t)) {
-                        bm25Map.put(t, bm25Map.get(t) + value);
-                    } else {
-                        bm25Map.put(t, value);
-                    }
-                }
-            }
-        }
-
-        return RetrievalModels.sortBM(bm25Map);
-    }*/
 
     private HashMap<String, Double> calculateBM25(String query, Integer queryID) {
         HashMap<String, Double> bm25Map = new HashMap<>();
@@ -97,9 +64,14 @@ public class BM25 implements RetrievalModel {
                 Integer ri = getRelevantCountForTerm(relevantDocs, documentKeySet);
                 Integer termDocumentCount = documentKeySet.size();
                 for (String docID : documentKeySet) {
-                    Double numerator = (ri + 0.5) / (R - ri + 0.5);
-                    Double denominator = (termDocumentCount - ri + 0.5) / (totalDocumentCount - termDocumentCount - R + ri + 0.5);
-                    Double value = Math.log(numerator / denominator);
+                    Double value;
+                    if (useRelevance) {
+                        Double numerator = (ri + 0.5) / (R - ri + 0.5);
+                        Double denominator = (termDocumentCount - ri + 0.5) / (totalDocumentCount - termDocumentCount - R + ri + 0.5);
+                        value = Math.log(numerator / denominator);
+                    } else {
+                        value = Math.log((totalDocumentCount - termDocumentCount + 0.5) / (termDocumentCount + 0.5));
+                    }
                     Integer termQueryCount = queryMap.get(s);
                     value = value * (((K1 + 1) * documentList.get(docID)) / (calculateK(tokenCountMap.get(docID), averageTokenCount) +
                             documentList.get(docID)));
