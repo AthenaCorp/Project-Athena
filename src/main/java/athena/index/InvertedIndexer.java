@@ -175,7 +175,6 @@ public class InvertedIndexer {
                     }
                 } else {
                     if (word.charAt(wordLength - 1) == '.') {
-                        //System.out.println(word);
                         tempString = word.substring(0, wordLength - 2);
                         if (tempString.length() > 0) {
                             validWords.add(tempString);
@@ -183,6 +182,9 @@ public class InvertedIndexer {
                     } else {
                         validWords.add(word);
                     }
+                }
+                if(word.equals("am")||word.equals("pm")){
+                    break;
                 }
             }
         }

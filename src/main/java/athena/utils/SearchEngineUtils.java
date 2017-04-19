@@ -60,7 +60,7 @@ public class SearchEngineUtils {
         return text.toLowerCase();
     }
 
-    public static String stoppedText(String text) {
+    public static ArrayList<String> getStopWords(){
         File file = new File(commonUtils.getResourcePath() + "\\query\\common_words");
         ArrayList<String> stopList = new ArrayList<>();
         try {
@@ -74,11 +74,15 @@ public class SearchEngineUtils {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return stopList;
 
+    }
+
+    public static String stoppedText(String text) {
+        ArrayList<String> stopList = getStopWords();
         for (String stopWord : stopList) {
             text = text.replaceAll(" "+stopWord+" ", " ");
         }
-
         return text;
     }
 
