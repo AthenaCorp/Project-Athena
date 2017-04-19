@@ -4,12 +4,14 @@ import athena.utils.CommonUtils;
 import athena.utils.SearchEngineUtils;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.core.SimpleAnalyzer;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
-import org.apache.lucene.index.*;
+import org.apache.lucene.index.DirectoryReader;
+import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
@@ -29,23 +31,22 @@ import java.util.Map;
 public class LuceneExecutor {
 
     private CommonUtils commonUtils = new CommonUtils();
-    private static Analyzer analyzer = new StandardAnalyzer();
-    private static Analyzer Sanalyzer = new SimpleAnalyzer();
+    private static Analyzer simpleAnalyzer = new SimpleAnalyzer();
 
     private IndexWriter writer;
     private ArrayList<File> queue = new ArrayList<>();
 
-    public void executor(Boolean isCreateIndex) {
+    public void executor(Boolean createIndex) {
         IndexSearcher searcher;
         TopScoreDocCollector collector;
         try {
             String indexLocation = commonUtils.getOutputPath() + "\\LuceneIndex";
             Path indexPath = new File(indexLocation).toPath();
-            if (isCreateIndex) {
-                commonUtils.clearFolder(indexLocation);
+            if (createIndex) {
+                commonUtils.cleanFolder(indexLocation);
                 String folderPath = commonUtils.getResourcePath() + "\\cacm";
                 FSDirectory dir = FSDirectory.open(indexPath);
-                IndexWriterConfig config = new IndexWriterConfig(Sanalyzer);
+                IndexWriterConfig config = new IndexWriterConfig(simpleAnalyzer);
                 writer = new IndexWriter(dir, config);
                 indexFileOrDirectory(folderPath);
                 writer.close();
@@ -53,17 +54,24 @@ public class LuceneExecutor {
             String outputFolder = commonUtils.getOutputPath() + "\\Lucene";
             commonUtils.verifyFolder(outputFolder);
             Map<Integer, String> queries = SearchEngineUtils.getQuerySet(commonUtils.getResourcePath() + "query\\cacm.query.txt");
+            String filename;
             for (int j = 1; j <= queries.size(); j++) {
                 IndexReader reader = DirectoryReader.open(FSDirectory.open(indexPath));
                 searcher = new IndexSearcher(reader);
                 collector = TopScoreDocCollector.create(100);
 
                 String s = queries.get(j);
-                Query q = new QueryParser("contents", Sanalyzer).parse(s);
+                Query q = new QueryParser("contents", simpleAnalyzer).parse(s);
                 searcher.search(q, collector);
                 ScoreDoc[] hits = collector.topDocs().scoreDocs;
 
-                FileWriter fileWriter = new FileWriter(new File(outputFolder + "\\" + j + ".txt"));
+                if (j < 10) {
+                    filename = outputFolder + "\\0" + j + ".txt";
+                } else {
+                    filename = outputFolder + "\\" + j + ".txt";
+                }
+
+                FileWriter fileWriter = new FileWriter(new File(filename));
                 for (int i = 0; i < hits.length; ++i) {
                     int docId = hits[i].doc;
                     Document d = searcher.doc(docId);
@@ -71,10 +79,6 @@ public class LuceneExecutor {
                 }
 
                 fileWriter.close();
-                //Term termInstance = new Term("contents", s);
-                //long termFreq = reader.totalTermFreq(termInstance);
-                //long docCount = reader.docFreq(termInstance);
-                //System.out.println(s + " Term Frequency " + termFreq + " - Document Frequency " + docCount);
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -82,7 +86,6 @@ public class LuceneExecutor {
             System.exit(-1);
         }
     }
-
 
     LuceneExecutor() {
     }
@@ -114,8 +117,7 @@ public class LuceneExecutor {
                 fr = new FileReader(f);
                 doc.add(new TextField("contents", fr));
                 doc.add(new StringField("path", f.getPath(), Field.Store.YES));
-                doc.add(new StringField("filename", f.getName(),
-                        Field.Store.YES));
+                doc.add(new StringField("filename", f.getName(), Field.Store.YES));
 
                 writer.addDocument(doc);
                 System.out.println("Added: " + f);

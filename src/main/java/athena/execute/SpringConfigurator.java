@@ -31,13 +31,13 @@ public class SpringConfigurator {
         String resourceFolder = commonUtils.getResourcePath();
         String inputFolder;
         if (Boolean.getBoolean(properties.getProperty("search.engine.enable.stemming"))) {
-            inputFolder = resourceFolder + properties.getProperty("search" +
-                    ".engine.steminput.folder") + "\\";
+            inputFolder = resourceFolder + properties.getProperty("search.engine.steminput.folder") + "\\";
         } else {
             inputFolder = resourceFolder + properties.getProperty("search.engine.input.folder") + "\\";
         }
         String indexFolder = resourceFolder + properties.getProperty("search.engine.index.folder") + "\\";
         indexer.setIndexFolder(indexFolder);
+        commonUtils.cleanFolder(indexFolder);
         indexer.createIndex(inputFolder);
         long stopTime = commonUtils.printTimeStamp("Index Creation Completed");
         commonUtils.printTotalTime(startTime, stopTime);

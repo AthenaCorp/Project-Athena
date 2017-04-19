@@ -31,14 +31,15 @@ public class CrawlerUtils {
     public void writeToFile(String folderName, String filename, String content, Integer FileType) {
         FileWriter fileWriter;
         try {
-            File file = new File(folderName + "/" + filename.replaceAll("[/+\"'@$%^*&<>,?]", "")
+            String fs = File.separator;
+            File file = new File(folderName + fs + filename.replaceAll("[/+\"'@$%^*&<>,?]", "")
                     + "." + fileTypes[FileType]);
             fileWriter = new FileWriter(file);
             fileWriter.write(content);
             fileWriter.close();
 
         } catch (IOException e) {
-            System.err.println(e.getMessage());
+            System.err.println("" + e.getMessage());
         }
     }
 

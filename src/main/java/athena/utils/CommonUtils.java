@@ -154,7 +154,7 @@ public class CommonUtils {
         return content;
     }
 
-    public void clearFolder(String folderPath) {
+    public void cleanFolder(String folderPath) {
         File file = new File(folderPath);
         if (file.exists()) {
             deleteFolder(file);

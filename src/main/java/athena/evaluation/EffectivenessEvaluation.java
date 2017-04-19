@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-
 public class EffectivenessEvaluation {
     @Autowired
     private CommonUtils commonUtils;
@@ -31,13 +30,11 @@ public class EffectivenessEvaluation {
         } else {
             for (File file : files) {
                 List<String> lines = commonUtils.getLinesFromFile(folderPath + fs + file.getName());
-                if((lines.size() != 0) && (!file.getName().equals("pAtK.txt"))){
-                    System.out.println(lines.size());
+                if ((lines.size() != 0) && (!file.getName().equals("pAtK.txt"))) {
                     totalPrecision += averagePrecision(lines);
                     totalReciprocal += reciprocalRank(lines);
                     precisionRecallValues(lines, folderPath);
-                }
-                else {
+                } else {
                     totalPrecision += 0;
                     totalReciprocal += 0;
                 }
@@ -51,13 +48,10 @@ public class EffectivenessEvaluation {
         System.out.println("Mean Reciprocal Rank: " + mean);
         System.out.println("P @ K values for 5, 20 printed in pAtK.txt");
         //calculatePAtK(folderPath);
-        System.out.println("Query-by-query precision/recall values printed " +
-                "in [qid]_prvalues.txt");
-
-
+        System.out.println("Query-by-query precision/recall values printed in [qid]_prvalues.txt");
     }
 
-    private double reciprocalRank(List<String> lines){
+    private double reciprocalRank(List<String> lines) {
         double count = 0.0;
         String[] tuple;
         tuple = lines.get(0).split(" ");
@@ -66,13 +60,13 @@ public class EffectivenessEvaluation {
             tuple = line.split(" ");
             count += 1.0;
             if (relevantDocs.contains(tuple[2])) {
-                return 1.0/count;
+                return 1.0 / count;
             }
         }
         return 0.0;
     }
 
-    private double averagePrecision(List<String> lines){
+    private double averagePrecision(List<String> lines) {
         double mean = 0.0;
         double count = 0.0;
         double relevantCount = 0.0;
@@ -89,14 +83,14 @@ public class EffectivenessEvaluation {
             }
 
         }
-        if(relevantCount != 0.0){
+        if (relevantCount != 0.0) {
             mean = totalPrecision / relevantCount;
         }
 
         return mean;
     }
 
-    private ArrayList<Double> listOfPrecision(List<String> lines){
+    private ArrayList<Double> listOfPrecision(List<String> lines) {
         ArrayList<Double> listOfPrecision = new ArrayList<>();
         double count = 0.0;
         double relevantCount = 0.0;
@@ -116,7 +110,7 @@ public class EffectivenessEvaluation {
         return listOfPrecision;
     }
 
-    private ArrayList<Double> listOfRecall(List<String> lines){
+    private ArrayList<Double> listOfRecall(List<String> lines) {
         ArrayList<Double> listOfRecall = new ArrayList<>();
         double relevantCount = 0.0;
         double totalRecall;
@@ -125,7 +119,7 @@ public class EffectivenessEvaluation {
         ArrayList<String> relevantDocs = getRelevance(Integer.parseInt(tuple[0]));
         for (String line : lines) {
             tuple = line.split(" ");
-            if(relevantDocs.contains(tuple[2])){
+            if (relevantDocs.contains(tuple[2])) {
                 relevantCount += 1.0;
             }
             totalRecall = (relevantCount / relevantDocs.size());
@@ -134,19 +128,18 @@ public class EffectivenessEvaluation {
         return listOfRecall;
     }
 
-    private void precisionRecallValues(List<String> lines, String folderPath){
+    private void precisionRecallValues(List<String> lines, String folderPath) {
         ArrayList<Double> lop = listOfPrecision(lines);
         ArrayList<Double> lor = listOfRecall(lines);
         String print = "";
-        for (int i = 0; i < lop.size(); i++){
-            print = print.concat(lop.get(i)+" "+lor.get(i)+"\n");
+        for (int i = 0; i < lop.size(); i++) {
+            print = print.concat(lop.get(i) + " " + lor.get(i) + "\n");
         }
 
         String[] tuple;
         tuple = lines.get(0).split(" ");
 
-        File file = new File(folderPath+ "\\" +
-                tuple[0]+"_prvalues.txt");
+        File file = new File(folderPath + "\\" + tuple[0] + "_prvalues.txt");
         FileWriter fileWriter;
         try {
             fileWriter = new FileWriter(file);
@@ -170,17 +163,16 @@ public class EffectivenessEvaluation {
         } else {
             for (File file : files) {
                 List<String> lines = commonUtils.getLinesFromFile(folderPath + fs + file.getName());
-                //System.out.println(lines);
-                if(lines.size() != 0){
+                if (lines.size() != 0) {
                     String[] tuple;
                     tuple = lines.get(0).split(" ");
                     String queryId = tuple[0];
                     ArrayList<Double> lstOfPrecision = listOfPrecision(lines);
-                    line  = line.concat(pAtK(lstOfPrecision, queryId)) ;
+                    line = line.concat(pAtK(lstOfPrecision, queryId));
                 }
 
             }
-            File file = new File(folderPath+ "\\" + "pAtK.txt");
+            File file = new File(folderPath + "\\" + "pAtK.txt");
             FileWriter fileWriter;
             try {
                 fileWriter = new FileWriter(file);
@@ -196,16 +188,14 @@ public class EffectivenessEvaluation {
     private String pAtK(ArrayList<Double> precValues, String qId) {
 
         double pAtK5, pAtK20;
-        if(precValues.size()>=5) {
+        if (precValues.size() >= 5) {
             pAtK5 = precValues.get(4);
-        }
-        else {
+        } else {
             pAtK5 = 0;
         }
-        if (precValues.size()>=20) {
+        if (precValues.size() >= 20) {
             pAtK20 = precValues.get(19);
-        }
-        else {
+        } else {
             pAtK20 = 0;
         }
 
@@ -214,22 +204,15 @@ public class EffectivenessEvaluation {
 
 
     }
-//
-//    public void writeToFilePAtK(ArrayList<Double> precisionValues, String query) {
-//        double pAtK5 = precisionValues.get(5);
-//        double pAtK20 = precisionValues.get(20);
-//        String line = query + pAtK5 + pAtK20;
-//
-//    }
 
     private ArrayList<String> getRelevance(int queryNumber) {
         String[] tuple;
         String filename = commonUtils.getResourcePath() + "//query//cacm.rel";
         List<String> lines = commonUtils.getLinesFromFile(filename);
-        ArrayList<String > relevantDocs = new ArrayList<>();
+        ArrayList<String> relevantDocs = new ArrayList<>();
         for (String line : lines) {
             tuple = line.split(" ");
-            if(Integer.parseInt(tuple[0]) == queryNumber){
+            if (Integer.parseInt(tuple[0]) == queryNumber) {
                 relevantDocs.add(tuple[2]);
             }
         }

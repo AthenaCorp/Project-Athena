@@ -65,6 +65,7 @@ public class InvertedIndexer {
 
     private void tokenizeHTMLFiles(String folderPath) {
         String content;
+        commonUtils.verifyFolder(dataFolder);
         try {
             File folder = new File(folderPath);
             File[] files = folder.listFiles();
@@ -153,9 +154,11 @@ public class InvertedIndexer {
     }
 
     public void createIndex(String inputFolder) {
+        System.out.println(inputFolder);
         tokenizeHTMLFiles(inputFolder);
         File folder = new File(dataFolder);
         File[] files = folder.listFiles();
+        System.out.println(files.length);
         createIndex(files, true);
     }
 
