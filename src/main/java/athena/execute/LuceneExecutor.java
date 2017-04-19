@@ -2,6 +2,7 @@ package athena.execute;
 
 import athena.utils.CommonUtils;
 import athena.utils.SearchEngineUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.core.SimpleAnalyzer;
 import org.apache.lucene.document.Document;
@@ -75,7 +76,11 @@ public class LuceneExecutor {
                 for (int i = 0; i < hits.length; ++i) {
                     int docId = hits[i].doc;
                     Document d = searcher.doc(docId);
-                    fileWriter.write(1 + " Q0 " + d.get("filename") + " " + (i + 1) + " " + hits[i].score + " Lucene\n");
+                    fileWriter.write(1 + " Q0 " + StringUtils.remove(d.get
+                            ("filename"), ".html") +
+                            "" +
+                            " " +
+                            (i + 1) + " " + hits[i].score + " Lucene\n");
                 }
 
                 fileWriter.close();
