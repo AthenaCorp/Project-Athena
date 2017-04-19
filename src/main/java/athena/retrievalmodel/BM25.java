@@ -41,7 +41,7 @@ public class BM25 implements RetrievalModel {
         return "BM25";
     }
 
-    private HashMap<String, Double> calculateBM25(String query, Integer queryID) {
+    /*private HashMap<String, Double> calculateBM25(String query, Integer queryID) {
         HashMap<String, Double> bm25Map = new HashMap<>();
         HashMap<String, HashMap<String, Integer>> index = invertedIndexer.readIndexFromJsonFile();
         HashMap<String, Integer> tokenCountMap = invertedIndexer.readTokenCountToJsonFile();
@@ -74,9 +74,9 @@ public class BM25 implements RetrievalModel {
         }
 
         return RetrievalModels.sortBM(bm25Map);
-    }
+    }*/
 
-    /*private HashMap<String, Double> calculateBM25(String query, Integer queryID) {
+    private HashMap<String, Double> calculateBM25(String query, Integer queryID) {
         HashMap<String, Double> bm25Map = new HashMap<>();
         HashMap<String, HashMap<String, Integer>> index = invertedIndexer.readIndexFromJsonFile();
         HashMap<String, Integer> tokenCountMap = invertedIndexer.readTokenCountToJsonFile();
@@ -89,7 +89,6 @@ public class BM25 implements RetrievalModel {
         Set<String> queryWords = queryMap.keySet();
         List<String> relevantDocs = SearchEngineUtils.getRelevance(queryID);
         Integer R = relevantDocs.size();
-        System.out.println("RelD :" + R);
 
         for (String s : queryWords) {
             documentList = index.get(s);
@@ -97,13 +96,11 @@ public class BM25 implements RetrievalModel {
                 documentKeySet = documentList.keySet();
                 Integer ri = getRelevantCountForTerm(relevantDocs, documentKeySet);
                 Integer termDocumentCount = documentKeySet.size();
-                System.out.println(s + ": " + ri + " - "+ termDocumentCount);
-                Integer termQueryCount = queryMap.get(s);
-                Double numerator = (ri + 0.5) / (R - ri + 0.5);
-                Double denominator = (termDocumentCount - ri + 0.5) / (totalDocumentCount - termDocumentCount - R + ri + 0.5);
-                Double value = Math.log(numerator / denominator);
-                System.out.println(value);
                 for (String docID : documentKeySet) {
+                    Double numerator = (ri + 0.5) / (R - ri + 0.5);
+                    Double denominator = (termDocumentCount - ri + 0.5) / (totalDocumentCount - termDocumentCount - R + ri + 0.5);
+                    Double value = Math.log(numerator / denominator);
+                    Integer termQueryCount = queryMap.get(s);
                     value = value * (((K1 + 1) * documentList.get(docID)) / (calculateK(tokenCountMap.get(docID), averageTokenCount) +
                             documentList.get(docID)));
                     value = value * (((K2 + 1) * termQueryCount) / (K2 + termQueryCount));
@@ -117,7 +114,7 @@ public class BM25 implements RetrievalModel {
         }
 
         return RetrievalModels.sortBM(bm25Map);
-    }*/
+    }
 
     private Integer getRelevantCountForTerm(List<String> relevantDocs, Set<String> termDocuments) {
         int count = relevantDocs.size();
