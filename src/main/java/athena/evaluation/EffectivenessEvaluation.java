@@ -26,6 +26,7 @@ public class EffectivenessEvaluation {
         double totalReciprocal = 0.0;
         double mean;
         String fs = File.separator;
+        String result = "";
         folderPath = commonUtils.getOutputPath() + fs + folderPath;
         File folder = new File(folderPath);
         File[] files = folder.listFiles();
@@ -37,6 +38,7 @@ public class EffectivenessEvaluation {
             for (File file : files) {
                 List<String> lines = commonUtils.getLinesFromFile(folderPath + fs + file.getName());
                 if ((lines.size() != 0) && (!file.getName().equals("pAtK.txt"))) {
+                    result= result + averagePrecision(lines) + "\n";
                     totalPrecision += averagePrecision(lines);
                     totalReciprocal += reciprocalRank(lines);
                     precisionRecallValues(lines, folderPath);
@@ -48,6 +50,8 @@ public class EffectivenessEvaluation {
                 count++;
             }
         }
+        String resultFolderPath = folderPath.concat("\\eval_results");
+        commonUtils.writeToFile(resultFolderPath + "\\" + "query_pr.txt", result);
         mean = totalPrecision / count;
         System.out.println("Mean average precision: " + mean);
         mean = totalReciprocal / count;

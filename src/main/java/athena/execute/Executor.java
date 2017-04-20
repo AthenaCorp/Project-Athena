@@ -1,5 +1,6 @@
 package athena.execute;
 
+import athena.evaluation.SignificanceTest;
 import athena.retrievalmodel.BM25;
 import athena.retrievalmodel.TfIdf;
 import athena.utils.CommonUtils;
@@ -10,6 +11,7 @@ public class Executor {
     public static void main(String[] args) {
         String folderPath = "HW3\\WebPages\\";
         Executor executor = new Executor();
+        System.out.println(SignificanceTest.performTTest("Hybrid1", "Hybrid"));
 
         //executor.executeTask1(folderPath);
         //executor.executeTask2();
