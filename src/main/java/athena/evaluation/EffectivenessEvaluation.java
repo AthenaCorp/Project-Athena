@@ -36,18 +36,19 @@ public class EffectivenessEvaluation {
             System.out.println("No files present or invalid folder");
         } else {
             for (File file : files) {
-                List<String> lines = commonUtils.getLinesFromFile(folderPath + fs + file.getName());
-                if ((lines.size() != 0) && (!file.getName().equals("pAtK.txt"))) {
-                    result= result + averagePrecision(lines) + "\n";
-                    totalPrecision += averagePrecision(lines);
-                    totalReciprocal += reciprocalRank(lines);
-                    precisionRecallValues(lines, folderPath);
-                } else {
-                    totalPrecision += 0;
-                    totalReciprocal += 0;
+                if(!file.isDirectory()) {
+                    List<String> lines = commonUtils.getLinesFromFile(folderPath + fs + file.getName());
+                    if ((lines.size() != 0) && (!file.getName().equals("pAtK.txt"))) {
+                        result = result + averagePrecision(lines) + "\n";
+                        totalPrecision += averagePrecision(lines);
+                        totalReciprocal += reciprocalRank(lines);
+                        precisionRecallValues(lines, folderPath);
+                    } else {
+                        totalPrecision += 0;
+                        totalReciprocal += 0;
+                    }
+                    count++;
                 }
-
-                count++;
             }
         }
         String resultFolderPath = folderPath.concat("\\eval_results");
@@ -161,15 +162,16 @@ public class EffectivenessEvaluation {
             System.out.println("No files present or invalid folder");
         } else {
             for (File file : files) {
-                List<String> lines = commonUtils.getLinesFromFile(folderPath + fs + file.getName());
-                if (lines.size() != 0) {
-                    String[] tuple;
-                    tuple = lines.get(0).split(" ");
-                    String queryId = tuple[0];
-                    ArrayList<Double> lstOfPrecision = listOfPrecision(lines);
-                    line = line.concat(pAtK(lstOfPrecision, queryId));
+                if(!file.isDirectory()) {
+                    List<String> lines = commonUtils.getLinesFromFile(folderPath + fs + file.getName());
+                    if (lines.size() != 0) {
+                        String[] tuple;
+                        tuple = lines.get(0).split(" ");
+                        String queryId = tuple[0];
+                        ArrayList<Double> lstOfPrecision = listOfPrecision(lines);
+                        line = line.concat(pAtK(lstOfPrecision, queryId));
+                    }
                 }
-
             }
             commonUtils.writeToFile(resultFolderPath + "\\" + "pAtK.txt", line);
             commonUtils.convertDocToCSV(resultFolderPath + "\\" + "pAtK.txt");

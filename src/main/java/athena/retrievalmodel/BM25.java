@@ -24,7 +24,7 @@ public class BM25 implements RetrievalModel {
     private Integer nGrams;
     @Value("${search.engine.print.size}")
     private Integer printSize;
-    @Value("${search.engine.snippet}")
+    @Value("${search.engine.enable.snippet}")
     private Boolean genSnippet;
     @Value("${search.engine.relevance.bm25}")
     private Boolean useRelevance;

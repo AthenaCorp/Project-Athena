@@ -1,8 +1,7 @@
 package athena.retrievalmodel;
 
 import athena.snippetgeneration.SnippetGeneration;
-import com.sun.org.apache.xpath.internal.operations.Bool;
-import org.springframework.beans.factory.annotation.Value;
+import athena.utils.CommonUtils;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -17,6 +16,7 @@ public class RetrievalModels {
     private static final String SPLIT_CHARACTER = " ";
 
     private static SnippetGeneration sn = new SnippetGeneration();
+    private static CommonUtils commonUtils = new CommonUtils();
 
     // Split the whole query into separate words and counts
     public static HashMap<String, Integer> getQueryMap(String query, Integer nGrams) {
@@ -60,17 +60,19 @@ public class RetrievalModels {
 
     public static void printN(HashMap<String, Double> hashMap, Integer
             queryID, String filePath, String model, Integer printSize, String
-             query, Boolean genSnippet) {
+                                      query, Boolean genSnippet) {
         int k = 1;
         DecimalFormat numberFormat = new DecimalFormat("#.000");
         File file = new File(filePath);
+        String snipFolder = file.getParent() + "\\Snippets";
+        commonUtils.verifyFolder(snipFolder);
         try {
             FileWriter fileWriter = new FileWriter(file);
             for (String s : hashMap.keySet()) {
                 fileWriter.write(queryID + " Q0 " + s + " " + k + " " + numberFormat.format(hashMap.get(s)) +
                         " Athena[" + model + "]\n");
-                if(genSnippet){
-                    fileWriter.write(sn.thisSnippet(s, query));
+                if (genSnippet) {
+                    commonUtils.appendToFile(snipFolder + "\\Snippet_" + queryID + ".txt", s + "\n" + sn.thisSnippet(s, query) + "\n\n");
                 }
                 k++;
                 if (k > printSize) {

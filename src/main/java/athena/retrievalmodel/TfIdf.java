@@ -26,7 +26,7 @@ public class TfIdf implements RetrievalModel {
     private Integer nGrams;
     @Value("${search.engine.print.size}")
     private Integer printSize;
-    @Value("${search.engine.snippet}")
+    @Value("${search.engine.enable.snippet}")
     private Boolean genSnippet;
 
     private HashMap<String, Double> tfIdfMap = new HashMap<>();

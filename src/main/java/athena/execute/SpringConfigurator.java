@@ -4,6 +4,7 @@ import athena.evaluation.EffectivenessEvaluation;
 import athena.index.InvertedIndexer;
 import athena.queryexpansion.PseudoRelevanceFeedback;
 import athena.retrievalmodel.RetrievalModel;
+import athena.snippetgeneration.SnippetGeneration;
 import athena.utils.CommonUtils;
 import athena.utils.SearchEngineUtils;
 import athena.utils.TextFileParser;
@@ -120,6 +121,7 @@ public class SpringConfigurator {
         Boolean doCaseFolding = Boolean.parseBoolean(properties.getProperty("search.engine.enable.case.fold"));
         Boolean doStopping = Boolean.parseBoolean(properties.getProperty("search.engine.enable.stopping"));
         Boolean doStemming = Boolean.parseBoolean(properties.getProperty("search.engine.enable.stemming"));
+        Boolean doSnippetGen = Boolean.parseBoolean(properties.getProperty("search.engine.enable.snippet"));
         Map<Integer, String> queries;
         if(doStemming) {
             filePath = "query\\cacm_stem.query.txt";
