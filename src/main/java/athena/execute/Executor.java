@@ -11,7 +11,7 @@ public class Executor {
     public static void main(String[] args) {
         String folderPath = "HW3\\WebPages\\";
         Executor executor = new Executor();
-        System.out.println(SignificanceTest.performTTest("Hybrid1", "Hybrid"));
+        System.out.println(SignificanceTest.performTTest("BM25_QE", "BM25_STOP"));
 
         //executor.executeTask1(folderPath);
         //executor.executeTask2();
