@@ -29,8 +29,9 @@ public class SpringConfigurator {
         long startTime = commonUtils.printTimeStamp("Index Creation Started");
         InvertedIndexer indexer = (InvertedIndexer) context.getBean("invertedIndexer");
         String resourceFolder = commonUtils.getResourcePath();
+        Boolean doStemming = Boolean.parseBoolean(properties.getProperty("search.engine.enable.stemming"));
         String inputFolder;
-        if (Boolean.getBoolean(properties.getProperty("search.engine.enable.stemming"))) {
+        if (doStemming) {
             createStemDocuments();
             inputFolder = resourceFolder + properties.getProperty("search.engine.steminput.folder") + "\\";
         } else {
@@ -110,7 +111,7 @@ public class SpringConfigurator {
     }
 
     private void executeAthena(Boolean createIndex) {
-        String filePath = "query\\cacm.query.txt";
+        String filePath;
         if (createIndex) {
             generateIndex();
         }
@@ -118,9 +119,17 @@ public class SpringConfigurator {
         setRetrievalModel();
         Boolean doCaseFolding = Boolean.parseBoolean(properties.getProperty("search.engine.enable.case.fold"));
         Boolean doStopping = Boolean.parseBoolean(properties.getProperty("search.engine.enable.stopping"));
-        Map<Integer, String> queries = SearchEngineUtils.getQuerySet(resourceFolder + filePath, doCaseFolding, doStopping);
+        Boolean doStemming = Boolean.parseBoolean(properties.getProperty("search.engine.enable.stemming"));
+        Map<Integer, String> queries;
+        if(doStemming) {
+            filePath = "query\\cacm_stem.query.txt";
+            queries = SearchEngineUtils.getQuerySetStem(resourceFolder + filePath, doCaseFolding, doStopping);
+        } else {
+            filePath = "query\\cacm.query.txt";
+            queries = SearchEngineUtils.getQuerySet(resourceFolder + filePath, doCaseFolding, doStopping);
+        }
 
-        for (int i = 1; i <= queries.size(); i++) {
+        for (Integer i : queries.keySet()) {
             retrieveRanking(queries.get(i), i);
         }
     }

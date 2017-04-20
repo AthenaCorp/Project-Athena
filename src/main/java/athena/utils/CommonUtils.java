@@ -1,5 +1,7 @@
 package athena.utils;
 
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -9,6 +11,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -196,5 +199,93 @@ public class CommonUtils {
             }
         }
         folder.delete();
+    }
+
+    public void convertDocToCSV(String filePath) {
+        try {
+            File file = new File(filePath);
+            FileReader fr = new FileReader(file);
+            BufferedReader br = new BufferedReader(fr);
+            String line = br.readLine();
+            List<List<String>> rowList = new ArrayList<>();
+            while (line != null) {
+                String[] strings = line.split(" ");
+                List<String> row = new ArrayList<>();
+                row.addAll(Arrays.asList(strings));
+                rowList.add(row);
+                line = br.readLine();
+            }
+            createCSV(rowList, filePath.replace(".txt", ".csv"));
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void convertDocToCSV(String filePath, List<String> headers) {
+        try {
+            File file = new File(filePath);
+            FileReader fr = new FileReader(file);
+            BufferedReader br = new BufferedReader(fr);
+            String line = br.readLine();
+            List<List<String>> rowList = new ArrayList<>();
+            while (line != null) {
+                String[] strings = line.split(" ");
+                List<String> row = new ArrayList<>();
+                row.addAll(Arrays.asList(strings));
+                rowList.add(row);
+                line = br.readLine();
+            }
+            createCSV(rowList, filePath.replace(".txt", ".csv"), headers);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void createCSV(List<List<String>> docList, String fileName) {
+        List<String> headers = new ArrayList<>();
+
+        for (Integer i = 0; i < docList.get(0).size(); i++) {
+            headers.add(i.toString());
+        }
+
+        createCSV(docList, fileName, headers);
+    }
+
+    public void createCSV(List<List<String>> docList, String fileName, List<String> headers) {
+        try {
+            CSVFormat csvFormat = CSVFormat.EXCEL;
+            File file = new File(fileName);
+            FileWriter fileWriter = new FileWriter(file);
+            CSVPrinter csvPrinter = new CSVPrinter(fileWriter, csvFormat);
+            List<String> record = new ArrayList<>();
+            for (String s : headers) {
+                record.add(s);
+            }
+            csvPrinter.printRecord(record);
+            for (List<String> record2 : docList) {
+                csvPrinter.printRecord(record2);
+            }
+            fileWriter.close();
+            csvPrinter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public List<String> readFile(String filePath) {
+        List<String> lines = new ArrayList<>();
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(new File(filePath)));
+            String line = br.readLine();
+            while (line != null) {
+                lines.add(line);
+                line = br.readLine();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return lines;
     }
 }

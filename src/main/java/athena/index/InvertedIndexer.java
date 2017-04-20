@@ -61,7 +61,7 @@ public class InvertedIndexer {
             File folder = new File(folderPath);
             File[] files = folder.listFiles();
             if (files == null) {
-                System.out.println("No files present or invalid folder");
+                System.out.println("In tokenizeHTMLFiles : No files present or invalid folder");
             } else {
                 for (File file : files) {
                     content = Jsoup.parse(file, FILE_ENCODING).text();
@@ -94,7 +94,8 @@ public class InvertedIndexer {
     }
 
     private String formatFileName(String fileName) {
-        return StringUtils.remove(fileName, ".html");
+        fileName = StringUtils.remove(fileName, ".html");
+        return StringUtils.remove(fileName, ".txt");
     }
 
     public HashMap<String, HashMap<String, Integer>> createIndex(File[] files, Boolean writeFlag) {

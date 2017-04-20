@@ -61,7 +61,6 @@ public class LuceneExecutor {
                 IndexReader reader = DirectoryReader.open(FSDirectory.open(indexPath));
                 searcher = new IndexSearcher(reader);
                 collector = TopScoreDocCollector.create(100);
-
                 String s = queries.get(j);
                 Query q = new QueryParser("contents", simpleAnalyzer).parse(s);
                 searcher.search(q, collector);

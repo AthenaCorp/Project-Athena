@@ -168,27 +168,13 @@ public class EffectivenessEvaluation {
 
             }
             commonUtils.writeToFile(resultFolderPath + "\\" + "pAtK.txt", line);
-            System.out.println("Precision at K " + getKList() +  " printed in pAtK.txt\n");
+            commonUtils.convertDocToCSV(resultFolderPath + "\\" + "pAtK.txt");
+            System.out.println("Precision at K " + getKList() + " printed in pAtK.txt\n");
         }
 
     }
 
-    /*private String pAtK(ArrayList<Double> precValues, String qId) {
 
-        double pAtK5, pAtK20;
-        if (precValues.size() >= 5) {
-            pAtK5 = precValues.get(4);
-        } else {
-            pAtK5 = 0;
-        }
-        if (precValues.size() >= 20) {
-            pAtK20 = precValues.get(19);
-        } else {
-            pAtK20 = 0;
-        }
-
-        return qId + " " + pAtK5 + " " + pAtK20 + "\n";
-    }*/
 
     private String pAtK(ArrayList<Double> precValues, String qId) {
         Double pAtk;

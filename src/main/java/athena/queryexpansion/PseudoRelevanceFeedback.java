@@ -54,6 +54,7 @@ public class PseudoRelevanceFeedback {
         return result;
     }
 
+
     public HashMap<String, Double> getRanking(String query, Integer queryID) {
         return retrievalModel.getRanking(expandQuery(query, queryID), queryID);
     }

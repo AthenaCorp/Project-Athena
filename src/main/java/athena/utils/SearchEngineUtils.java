@@ -32,10 +32,19 @@ public class SearchEngineUtils {
             Elements elements = content.getElementsByTag("doc");
             for (Element e : elements) {
                 String[] element = e.text().split(" ", 2);
-                queries.put(Integer.parseInt(element[0]), cleanDocumentContent(element[1], doCaseFold, doStopping));
+                queries.put(Integer.parseInt(element[0]), cleanDocumentContent(element[1], doCaseFold, doStopping).trim());
             }
         } catch (IOException e) {
             System.err.println(e.getMessage());
+        }
+        return queries;
+    }
+
+    public static Map<Integer, String> getQuerySetStem(String filename, Boolean doCaseFold, Boolean doStopping) {
+        Map<Integer, String> queries = new HashMap<>();
+        for(String line : commonUtils.readFile(filename)) {
+            String[] element = line.split("-");
+            queries.put(Integer.parseInt(element[0]), cleanDocumentContent(element[1], doCaseFold, doStopping));
         }
         return queries;
     }
