@@ -27,6 +27,28 @@ public class CommonUtils {
         verifyFolder(getOutputPath());
     }
 
+    public void writeToFile(String filePath, String fileContent) {
+        try {
+            File file = new File(filePath);
+            FileWriter fileWriter = new FileWriter(file);
+            fileWriter.write(fileContent);
+            fileWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void appendToFile(String filePath, String fileContent) {
+        try {
+            File file = new File(filePath);
+            FileWriter fileWriter = new FileWriter(file, true);
+            fileWriter.write(fileContent);
+            fileWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public List<Element> extractLinks(Document document) {
         String elementUrl;
         List<Element> elementList = new ArrayList<>();

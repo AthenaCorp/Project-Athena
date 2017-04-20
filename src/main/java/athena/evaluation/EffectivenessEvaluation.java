@@ -3,11 +3,10 @@ package athena.evaluation;
 import athena.utils.CommonUtils;
 import athena.utils.SearchEngineUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,6 +14,11 @@ import java.util.List;
 public class EffectivenessEvaluation {
     @Autowired
     private CommonUtils commonUtils;
+
+    @Value("${search.engine.precision.k}")
+    private String precisionKs;
+
+    private List<Integer> kList;
 
     public void evaluation(String folderPath) {
         double count = 0.0;
@@ -48,7 +52,6 @@ public class EffectivenessEvaluation {
         System.out.println("Mean average precision: " + mean);
         mean = totalReciprocal / count;
         System.out.println("Mean Reciprocal Rank: " + mean);
-        System.out.println("P @ K values for 5, 20 printed in pAtK.txt");
         //calculatePAtK(folderPath);
         System.out.println("Query-by-query precision/recall values printed in [qid]_prvalues.txt");
     }
@@ -137,23 +140,10 @@ public class EffectivenessEvaluation {
         for (int i = 0; i < lop.size(); i++) {
             print = print.concat(lop.get(i) + " " + lor.get(i) + "\n");
         }
-
         String[] tuple;
         tuple = lines.get(0).split(" ");
-
         String resultFolderPath = folderPath.concat("\\eval_results");
-
-        File file = new File(resultFolderPath + "\\" + tuple[0] + "_prvalues" +
-                ".txt");
-        FileWriter fileWriter;
-        try {
-            fileWriter = new FileWriter(file);
-            fileWriter.write(print);
-            fileWriter.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
+        commonUtils.writeToFile(resultFolderPath + "\\" + tuple[0] + "_prvalues.txt", print);
     }
 
     private void calculatePAtK(String folderPath) {
@@ -161,6 +151,8 @@ public class EffectivenessEvaluation {
         File folder = new File(folderPath);
         File[] files = folder.listFiles();
         String line = "";
+        String resultFolderPath = folderPath.concat("\\eval_results");
+        commonUtils.verifyFolder(resultFolderPath);
         if (files == null) {
             System.out.println("No files present or invalid folder");
         } else {
@@ -175,22 +167,13 @@ public class EffectivenessEvaluation {
                 }
 
             }
-            commonUtils.verifyFolder(folderPath + "\\eval_results");
-            String resultFolderPath = folderPath.concat("\\eval_results");
-            File file = new File(resultFolderPath + "\\" + "pAtK.txt");
-            FileWriter fileWriter;
-            try {
-                fileWriter = new FileWriter(file);
-                fileWriter.write(line);
-                fileWriter.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            commonUtils.writeToFile(resultFolderPath + "\\" + "pAtK.txt", line);
+            System.out.println("Precision at K " + getKList() +  " printed in pAtK.txt\n");
         }
 
     }
 
-    private String pAtK(ArrayList<Double> precValues, String qId) {
+    /*private String pAtK(ArrayList<Double> precValues, String qId) {
 
         double pAtK5, pAtK20;
         if (precValues.size() >= 5) {
@@ -204,9 +187,32 @@ public class EffectivenessEvaluation {
             pAtK20 = 0;
         }
 
-        String line = qId + " " + pAtK5 + " " + pAtK20 + "\n";
-        return line;
+        return qId + " " + pAtK5 + " " + pAtK20 + "\n";
+    }*/
 
+    private String pAtK(ArrayList<Double> precValues, String qId) {
+        Double pAtk;
+        List<Integer> kList = getKList();
+        StringBuilder lineBuilder = new StringBuilder(qId);
+        for (Integer k : kList) {
+            if (precValues.size() >= k) {
+                pAtk = precValues.get(k - 1);
+            } else {
+                pAtk = 0.0;
+            }
+            lineBuilder.append(" ").append(pAtk);
+        }
+        return lineBuilder.toString() + "\n";
+    }
 
+    private List<Integer> getKList() {
+        if (kList == null) {
+            String[] kStrings = precisionKs.split(",");
+            kList = new ArrayList<>();
+            for (String s : kStrings) {
+                kList.add(Integer.parseInt(s.trim()));
+            }
+        }
+        return kList;
     }
 }

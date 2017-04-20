@@ -62,16 +62,17 @@ public class BM25 implements RetrievalModel {
                 documentKeySet = documentList.keySet();
                 Integer ri = getRelevantCountForTerm(relevantDocs, documentKeySet);
                 Integer termDocumentCount = documentKeySet.size();
+                Double logValue;
+                if (useRelevance) {
+                    Double numerator = (ri + 0.5) / (R - ri + 0.5);
+                    Double denominator = (termDocumentCount - ri + 0.5) / (totalDocumentCount - termDocumentCount - R + ri + 0.5);
+                    logValue = Math.log(numerator / denominator);
+                } else {
+                    logValue = Math.log((totalDocumentCount - termDocumentCount + 0.5) / (termDocumentCount + 0.5));
+                }
+                Integer termQueryCount = queryMap.get(s);
                 for (String docID : documentKeySet) {
-                    Double value;
-                    if (useRelevance) {
-                        Double numerator = (ri + 0.5) / (R - ri + 0.5);
-                        Double denominator = (termDocumentCount - ri + 0.5) / (totalDocumentCount - termDocumentCount - R + ri + 0.5);
-                        value = Math.log(numerator / denominator);
-                    } else {
-                        value = Math.log((totalDocumentCount - termDocumentCount + 0.5) / (termDocumentCount + 0.5));
-                    }
-                    Integer termQueryCount = queryMap.get(s);
+                    Double value = logValue;
                     value = value * (((K1 + 1) * documentList.get(docID)) / (calculateK(tokenCountMap.get(docID), averageTokenCount) +
                             documentList.get(docID)));
                     value = value * (((K2 + 1) * termQueryCount) / (K2 + termQueryCount));
