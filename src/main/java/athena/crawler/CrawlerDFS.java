@@ -46,7 +46,6 @@ public class CrawlerDFS {
                 nextURL = localFrontier.entrySet().iterator().next();
 
                 // Calling self recursively with the left most child and so on
-
                 startCrawlerDFS(nextURL.getKey(), depth + 1, keyword);
             }
         }
